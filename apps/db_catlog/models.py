@@ -90,6 +90,8 @@ class DkCatalog(BaseModel):
     name_en = Column("name_en", String(128), comment="英文名")
     catalog_code = Column("catalog_code", String(128), comment="目录编码")
     parent_id = Column("parent_id", String(255), comment="父级")
+    parents = relationship("DkCatalog",
+                           primaryjoin='DkCatalog.id==foreign(DkCatalog.parent_id)', backref=backref('dk_catalog',remote_side='DkCatalog.id'))
     order_no = Column("order_no", Integer, comment="排序")
     is_show = Column("is_show", Boolean, default=True, comment="是否显示:1显示;0不显示")
     creator = Column("creator", String(255), comment="创建者")

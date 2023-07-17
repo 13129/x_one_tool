@@ -28,7 +28,7 @@ class DkDnsRouter:
                         get_all_route=False, get_one_route=False)
 
     @staticmethod
-    @router.get('')
+    @router.get('',summary='获取全部数据源')
     async def overloaded_dk_dns_get_all(pagination=router.pagination, session=Depends(router.db_func)):
         skip, limit = pagination.get("skip"), pagination.get("limit")
         query = select(DkDnsRouter.router.db_model).options(
@@ -39,7 +39,7 @@ class DkDnsRouter:
         return result.scalars().all()
 
     @staticmethod
-    @router.get('/{item_id}')
+    @router.get('/{item_id}',summary='获取数据源详情')
     async def overloaded_dk_dns_get_one(session=Depends(router.db_func), item_id=None):
         query = select(DkDnsRouter.router.db_model).options(
             joinedload(DkDnsRouter.router.db_model.datasource_type, innerjoin=True)).where(
@@ -68,8 +68,8 @@ class DkTableRouter:
     async def overloaded_dk_table_get_one(session=Depends(router.db_func), item_id=None):
         query = select(DkTableRouter.router.db_model).options(
             joinedload(DkTableRouter.router.db_model.fields, innerjoin=True)).options(
-                joinedload(DkTableRouter.router.db_model.datasource, innerjoin=True)).where(
-                DkTableRouter.router.db_model.id == item_id)
+            joinedload(DkTableRouter.router.db_model.datasource, innerjoin=True)).where(
+            DkTableRouter.router.db_model.id == item_id)
 
         result = await session.execute(query)
         return result.scalars().unique().all()
@@ -78,7 +78,27 @@ class DkTableRouter:
 class DkCatalogRouter:
     router = CRUDRouter(schema=DkCatalogSchema, db_model=DkCatalog, db=get_db, tags=["目录管理"])
 
+    @staticmethod
+    @router.get('', summary='获取全部目录')
+    async def overloaded_dk_catalog_get_all(session=Depends(router.db_func)):
+        query = select(DkCatalogRouter.router.db_model).options(
+            joinedload(DkCatalogRouter.router.db_model.parents, innerjoin=True)).order_by(
+            DkCatalogRouter.router.db_model.order_no)
+        result = await session.execute(query)
+        return result.scalars().unique().all()
+
+    @staticmethod
+    @router.get('/{item_id}', summary='获取目录详情')
+    async def overloaded_dk_catalog_get_all(session=Depends(router.db_func), item_id: str = None):
+        query = select(DkCatalogRouter.router.db_model).options(
+            joinedload(DkCatalogRouter.router.db_model.parents, innerjoin=True)).where(
+            DkCatalogRouter.router.db_model.id == item_id).order_by(
+            DkCatalogRouter.router.db_model.order_no)
+        result = await session.execute(query)
+        return result.scalars().unique().all()
+
 
 class DkCatalogTableRelationalRouter:
     router = CRUDRouter(schema=DkCatalogTableRelationalSchema, db_model=DkCatalogTableRelational, db=get_db,
+                        get_one_route=False,
                         tags=["目录关联管理"])

@@ -77,7 +77,6 @@ class DkFieldSchema(BaseModelSchema):
         orm_mode = True
 
 
-
 class DkCatalogSchema(BaseModelSchema):
     name_cn: str
     name_en: str
