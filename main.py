@@ -11,8 +11,8 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
-from setting import settings
 from apps.db_catlog import db_c_api as db_c_api
+from setting import settings
 
 os.environ["TZ"] = settings.TIMEZONE
 app = FastAPI(
@@ -71,6 +71,7 @@ async def redoc_html():
         redoc_js_url="/static/redoc.standalone.js",
     )
 
+
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
@@ -92,4 +93,4 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 if __name__ == '__main__':
-    uvicorn.run(app='main:app', reload=True,workers=3)
+    uvicorn.run(app='main:app', reload=True, workers=3)
