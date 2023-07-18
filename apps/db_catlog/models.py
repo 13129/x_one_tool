@@ -93,6 +93,12 @@ class DkCatalog(BaseModel):
     parents = relationship("DkCatalog",
                            primaryjoin='DkCatalog.id==foreign(DkCatalog.parent_id)',
                            backref=backref('dk_catalog', remote_side='DkCatalog.id'))
+    # catalog_code_id = relationship("DkCatalog",
+    #                        primaryjoin='DkCatalog.id==foreign(DkCatalog.parent_id)',
+    #                        backref=backref('dk_catalog', remote_side='DkCatalog.id'))
+    # table_code = relationship("DkCatalog",
+    #                        primaryjoin='DkCatalog.id==foreign(DkCatalog.parent_id)',
+    #                        backref=backref('dk_catalog', remote_side='DkCatalog.id'))
     order_no = Column("order_no", Integer, comment="排序")
     is_show = Column("is_show", Boolean, default=True, comment="是否显示:1显示;0不显示")
     creator = Column("creator", String(255), comment="创建者")

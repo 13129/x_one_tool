@@ -3,8 +3,6 @@ from ._utils import get_pk_type, schema_factory, create_query_validation_excepti
 from ._types import DEPENDENCIES, PAGINATION, PYDANTIC_SCHEMA
 from ._base import NOT_FOUND, CRUDGenerator
 from ._repository import BaseModelSchema
-from ._cbv import cbv
-# from common.sqlalchemy import SQLAlchemyCRUDRouter
 
 __all__ = [
     "BaseModel",
@@ -19,5 +17,4 @@ __all__ = [
     "PAGINATION",
     "PYDANTIC_SCHEMA",
     "BaseModelSchema",
-    "cbv"
 ]

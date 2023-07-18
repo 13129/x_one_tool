@@ -3,15 +3,15 @@
 # @Author  : XJC
 # @desc    :
 from fastapi import APIRouter
-from apps.db_catlog.routers import (dk_dns_router, dk_table_router, dk_catalog_router, dk_dns_type_router,
-                                    dk_catalog_table_relation)
+from apps.db_catlog.routers import DkDnsRouter, DkDnsTypeRouter, DkTableRouter, DkCatalogRouter, \
+    DkCatalogTableRelationalRouter
 
 router = APIRouter()
-router.include_router(dk_dns_type_router)
-router.include_router(dk_dns_router)
-router.include_router(dk_table_router)
-router.include_router(dk_catalog_router)
-router.include_router(dk_catalog_table_relation)
+router.include_router(DkDnsTypeRouter.router)
+router.include_router(DkDnsRouter.router)
+router.include_router(DkTableRouter.router)
+router.include_router(DkCatalogRouter.router)
+router.include_router(DkCatalogTableRelationalRouter.router)
 
 db_c_api = APIRouter()
 db_c_api.include_router(router, prefix="/catalogs", )
