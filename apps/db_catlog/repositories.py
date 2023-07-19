@@ -76,6 +76,19 @@ class DkFieldSchema(BaseModelSchema):
     class Config:
         orm_mode = True
 
+class DkCatalogTableRelationalSchema(BaseModelSchema):
+    catalog_code_id: str
+    tabl_code_id: str
+    order_no: str
+    is_show: bool
+    creator: str
+    create_time: datetime
+    last_modifier: str
+    last_modify_time: datetime
+
+    class Config:
+        orm_mode = True
+
 
 class DkCatalogSchema(BaseModelSchema):
     name_cn: str
@@ -88,20 +101,9 @@ class DkCatalogSchema(BaseModelSchema):
     create_time: datetime
     last_modifier: str
     last_modify_time: datetime
-
+    catalog_table: List[DkCatalogTableRelationalSchema]
     class Config:
         orm_mode = True
 
 
-class DkCatalogTableRelationalSchema(BaseModelSchema):
-    catalog_code_id: str
-    table_code_id: str
-    order_no: str
-    is_show: bool
-    creator: str
-    create_time: datetime
-    last_modifier: str
-    last_modify_time: datetime
 
-    class Config:
-        orm_mode = True

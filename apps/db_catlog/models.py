@@ -5,7 +5,7 @@ coding:utf-8
 @Description:
 """
 from sqlalchemy import Column, String, DateTime, Boolean, func, Integer, Text
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, Mapped
 
 from apps.base import BaseModel
 
@@ -53,6 +53,13 @@ class DkCatalogTable(BaseModel):
     fields = relationship('DkCatalogField',
                           primaryjoin='DkCatalogTable.table_code==foreign(DkCatalogField.table_code)',
                           backref=backref('dk_catalog_table'))
+
+    tables = relationship("DkCatalog",
+                          secondary='dk_catalog_table_relational_info',
+                          primaryjoin='foreign(dk_catalog_table_relational_info.c.catalog_code_id)==DkCatalog.id',
+                          secondaryjoin='foreign(dk_catalog_table_relational_info.c.tabl_code_id)==DkCatalogTable.id',
+                          back_populates='ctl_tables')
+
     table_type = Column("table_type", String(64), comment="表类型")
     is_open = Column("is_open", Boolean, default=True, comment="是否公开;1-公开;0不公开")
     is_edit = Column("is_edit", Boolean, default=False, comment="是否可编辑;1-可编辑;0不可编辑")
@@ -93,12 +100,11 @@ class DkCatalog(BaseModel):
     parents = relationship("DkCatalog",
                            primaryjoin='DkCatalog.id==foreign(DkCatalog.parent_id)',
                            backref=backref('dk_catalog', remote_side='DkCatalog.id'))
-    # catalog_code_id = relationship("DkCatalog",
-    #                        primaryjoin='DkCatalog.id==foreign(DkCatalog.parent_id)',
-    #                        backref=backref('dk_catalog', remote_side='DkCatalog.id'))
-    # table_code = relationship("DkCatalog",
-    #                        primaryjoin='DkCatalog.id==foreign(DkCatalog.parent_id)',
-    #                        backref=backref('dk_catalog', remote_side='DkCatalog.id'))
+    ctl_tables = relationship("DkCatalogTable",
+                              secondary='dk_catalog_table_relational_info',
+                              primaryjoin='foreign(dk_catalog_table_relational_info.c.catalog_code_id)==DkCatalog.id',
+                              secondaryjoin='foreign(dk_catalog_table_relational_info.c.tabl_code_id)==DkCatalogTable.id',
+                              back_populates='tables')
     order_no = Column("order_no", Integer, comment="排序")
     is_show = Column("is_show", Boolean, default=True, comment="是否显示:1显示;0不显示")
     creator = Column("creator", String(255), comment="创建者")
@@ -111,7 +117,14 @@ class DkCatalog(BaseModel):
 class DkCatalogTableRelational(BaseModel):
     __tablename__ = 'dk_catalog_table_relational_info'
     catalog_code_id = Column("catalog_code_id", String(128), comment="目录编码ID")
-    table_code_id = Column("tabl_code_id", String(128), comment="表编码ID")
+    ctl = relationship("DkCatalog",
+                       primaryjoin='foreign(DkCatalog.id)==DkCatalogTableRelational.c.catalog_code_id',
+                       back_populates="ctl_tables")
+    # tb = relationship("DkCatalogTable",
+    #                   primaryjoin='foreign(DkCatalogTableRelational.c.tabl_code_id)==DkCatalogTable.id',
+    #                   back_populates="tables")
+
+    tabl_code_id = Column("tabl_code_id", String(128), comment="表编码ID")
     order_no = Column("order_no", Integer, comment="排序")
     is_show = Column("is_show", Boolean, default=True, comment="是否显示:1显示;0不显示")
     creator = Column("creator", String(255), comment="创建者")
