@@ -76,6 +76,7 @@ class DkFieldSchema(BaseModelSchema):
     class Config:
         orm_mode = True
 
+
 class DkCatalogTableRelationalSchema(BaseModelSchema):
     catalog_code_id: str
     tabl_code_id: str
@@ -102,8 +103,6 @@ class DkCatalogSchema(BaseModelSchema):
     last_modifier: str
     last_modify_time: datetime
     catalog_table: List[DkCatalogTableRelationalSchema]
+
     class Config:
         orm_mode = True
-
-
-
