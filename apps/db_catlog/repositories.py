@@ -4,9 +4,10 @@ coding:utf-8
 @Author:XJC
 @Description:
 """
+from __future__ import annotations
 from datetime import datetime
 from ipaddress import IPv4Address
-from typing import List
+from typing import List, Union
 
 from apps.base import BaseModelSchema
 
@@ -86,6 +87,8 @@ class DkCatalogTableRelationalSchema(BaseModelSchema):
     create_time: datetime
     last_modifier: str
     last_modify_time: datetime
+    table_info: DkTableSchema
+    child_info: List["DkCatalogSchema"] = []  # noqa: F401
 
     class Config:
         orm_mode = True
@@ -102,7 +105,7 @@ class DkCatalogSchema(BaseModelSchema):
     create_time: datetime
     last_modifier: str
     last_modify_time: datetime
-    catalog_table: List[DkCatalogTableRelationalSchema]
+    ctl_tb_relation_info: List[DkCatalogTableRelationalSchema]
 
     class Config:
         orm_mode = True
