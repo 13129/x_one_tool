@@ -22,19 +22,14 @@ class DkDnsTypeRouter:
     router = CRUDRouter(schema=DkDnsTypeSchema, create_schema=DkDnsTypeSchemaCreate, db_model=DkDNSType,
                         db=get_db,
                         update_route=False, delete_all_route=False, delete_one_route=False,
-                        tags=["元数据"])
-    # @classmethod
-    # @router.get('/test', summary='获取全部元数据')
-    # async def test(cls):
-    #     print("测试")
-    #     return {"1":200}
+                        tags=["元数据"], prefix='dataDnsTypes')
 
 
 # @cbv(dk_dns_router)
 class DkDnsRouter:
     router = CRUDRouter(schema=DkDnsSchema, create_schema=DkDnsSchemaCreate, db_model=DkDataSourceInfo,
                         db=get_db,
-                        tags=["数据源"],
+                        tags=["数据源"], prefix='dataDns',
                         get_all_route=False, get_one_route=False)
 
     @staticmethod
@@ -61,7 +56,7 @@ class DkDnsRouter:
 class DkTableRouter:
     router = CRUDRouter(schema=DkTableSchema, create_schema=DkTableSchemaCreate, db_model=DkCatalogTable,
                         db=get_db,
-                        get_all_route=False, tags=["表管理"])
+                        get_all_route=False, tags=["表管理"], prefix='dataTables')
 
     @staticmethod
     @router.get('', summary='获取所有表列表')
@@ -87,7 +82,7 @@ class DkTableRouter:
 
 
 class DkCatalogRouter:
-    router = CRUDRouter(schema=DkCatalogSchema, db_model=DkCatalog, db=get_db, tags=["目录管理"])
+    router = CRUDRouter(schema=DkCatalogSchema, db_model=DkCatalog, db=get_db, tags=["目录管理"], prefix='dataCatalogs')
 
     @staticmethod
     @router.get('', summary='获取全部目录')
@@ -109,7 +104,8 @@ class DkCatalogRouter:
         return result.scalars().unique().all()
 
     @staticmethod
-    @router.api_route('/catalog_table_relation/', methods=['GET'], summary='获取目录与表关联清单列表', response_model=DkCatalogSchema)
+    @router.api_route('/catalogTableRelationList/', methods=['GET'], summary='获取目录与表关联清单列表',
+                      response_model=DkCatalogSchema)
     async def dk_catalog_table_relation_get_all(session=Depends(router.db_func)):
         query = select(DkCatalogRouter.router.db_model).options(
             joinedload(DkCatalogRouter.router.db_model.child_info, innerjoin=True).options(
@@ -121,35 +117,31 @@ class DkCatalogRouter:
         result = await session.execute(query)
         result = jsonable_encoder(result.scalars().unique().all())
 
-        return JSONResponse(status_code=200, content={"success": "ok","code":200 ,"data": result})
-
-    @staticmethod
-    @router.api_route('/relational_table_data_query/', methods=['GET'], summary='获取关联表数据查询', response_model=DkCatalogSchema)
-    async def dk_catalog_table_relation_get_all(session=Depends(router.db_func)):
-        query = select(DkCatalogRouter.router.db_model).options(
-            joinedload(DkCatalogRouter.router.db_model.child_info, innerjoin=True).options(
-                joinedload(DkCatalogRouter.router.db_model.ctl_tb_relation_info, innerjoin=True).options(joinedload(
-                    DkCatalogTableRelationalRouter.router.db_model.table_info)))).options(
-            joinedload(DkCatalogRouter.router.db_model.ctl_tb_relation_info, innerjoin=True).options(joinedload(
-                DkCatalogTableRelationalRouter.router.db_model.table_info).options(joinedload(DkTableRouter.router.db_model.datasource_info))))
-
-        result = await session.execute(query)
-        result = jsonable_encoder(result.scalars().unique().all())
-
-        return JSONResponse(status_code=200, content={"success": "ok","code":200 ,"data": result})
+        return JSONResponse(status_code=200, content={"success": "ok", "code": 200, "data": result})
 
 
 class DkCatalogTableRelationalRouter:
     router = CRUDRouter(schema=DkCatalogTableRelationalSchema, db_model=DkCatalogTableRelational,
                         db=get_db, get_all_route=False, get_one_route=False,
-                        tags=["目录关联管理"])
-#
-#     @staticmethod
-#     @router.get('', summary='获取全部目录表关联')
-#     async def overload_dk_catalog_get_all(session=Depends(router.db_func)):
-#         query = select(DkCatalogTableRelationalRouter.router.db_model).options(
-#             joinedload(DkCatalogTableRelationalRouter.router.db_model.parents, innerjoin=True)).options(
-#             joinedload(DkCatalogTableRelationalRouter.router.db_model.catalog_table, innerjoin=True)).order_by(
-#             DkCatalogTableRelationalRouter.router.db_model.order_no)
-#         result = await session.execute(query)
-#         return result.scalars().unique().all()
+                        tags=["目录关联管理"], prefix='catalogTableRelations')
+
+
+class DkDataQueryRouter:
+    router = CRUDRouter(schema=DkCatalogSchema, db_model=DkCatalog, db=get_db, tags=["数据检索服务"],
+                        prefix='/dataPools')
+
+    @staticmethod
+    @router.api_route('/queryData/', methods=['POST'], summary='数据池数据查询')
+    async def dk_query_data(session=Depends(router.db_func)):
+        query = select(DkCatalogRouter.router.db_model).options(
+            joinedload(DkCatalogRouter.router.db_model.child_info, innerjoin=True).options(
+                joinedload(DkCatalogRouter.router.db_model.ctl_tb_relation_info, innerjoin=True).options(joinedload(
+                    DkCatalogTableRelationalRouter.router.db_model.table_info)))).options(
+            joinedload(DkCatalogRouter.router.db_model.ctl_tb_relation_info, innerjoin=True).options(joinedload(
+                DkCatalogTableRelationalRouter.router.db_model.table_info).options(
+                joinedload(DkTableRouter.router.db_model.datasource_info))))
+
+        result = await session.execute(query)
+        result = jsonable_encoder(result.scalars().unique().all())
+
+        return JSONResponse(status_code=200, content={"success": "ok", "code": 200, "data": result})
