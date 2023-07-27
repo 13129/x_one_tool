@@ -123,20 +123,20 @@ class DkCatalogRouter:
 
         return JSONResponse(status_code=200, content={"success": "ok","code":200 ,"data": result})
 
-    @staticmethod
-    @router.api_route('/relational_table_data_query/', methods=['GET'], summary='获取关联表数据查询', response_model=DkCatalogSchema)
-    async def dk_catalog_table_relation_get_all(session=Depends(router.db_func)):
-        query = select(DkCatalogRouter.router.db_model).options(
-            joinedload(DkCatalogRouter.router.db_model.child_info, innerjoin=True).options(
-                joinedload(DkCatalogRouter.router.db_model.ctl_tb_relation_info, innerjoin=True).options(joinedload(
-                    DkCatalogTableRelationalRouter.router.db_model.table_info)))).options(
-            joinedload(DkCatalogRouter.router.db_model.ctl_tb_relation_info, innerjoin=True).options(joinedload(
-                DkCatalogTableRelationalRouter.router.db_model.table_info).options(joinedload(DkTableRouter.router.db_model.datasource_info))))
-
-        result = await session.execute(query)
-        result = jsonable_encoder(result.scalars().unique().all())
-
-        return JSONResponse(status_code=200, content={"success": "ok","code":200 ,"data": result})
+    # @staticmethod
+    # @router.api_route('/relational_table_data_query/', methods=['GET'], summary='获取关联表数据查询', response_model=DkCatalogSchema)
+    # async def dk_catalog_table_relation_get_all(session=Depends(router.db_func)):
+    #     query = select(DkCatalogRouter.router.db_model).options(
+    #         joinedload(DkCatalogRouter.router.db_model.child_info, innerjoin=True).options(
+    #             joinedload(DkCatalogRouter.router.db_model.ctl_tb_relation_info, innerjoin=True).options(joinedload(
+    #                 DkCatalogTableRelationalRouter.router.db_model.table_info)))).options(
+    #         joinedload(DkCatalogRouter.router.db_model.ctl_tb_relation_info, innerjoin=True).options(joinedload(
+    #             DkCatalogTableRelationalRouter.router.db_model.table_info).options(joinedload(DkTableRouter.router.db_model.datasource_info))))
+    #
+    #     result = await session.execute(query)
+    #     result = jsonable_encoder(result.scalars().unique().all())
+    #
+    #     return JSONResponse(status_code=200, content={"success": "ok","code":200 ,"data": result})
 
 
 class DkCatalogTableRelationalRouter:
