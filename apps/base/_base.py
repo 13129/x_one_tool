@@ -61,7 +61,7 @@ class CRUDGenerator(Generic[T], APIRouter, ABC):
             else delete_schema_factory(self.schema, pk_field_name=self._pk, del_field_name=self._del, name="Delete")
         )
 
-        prefix = str(prefix if prefix else self.schema.__name__).lower()
+        prefix = str(prefix if prefix else self.schema.__name__)
         prefix = self._base_path + prefix.strip("/")
         tags = tags or [prefix.strip("/").capitalize()]
 
