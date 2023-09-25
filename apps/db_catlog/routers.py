@@ -4,11 +4,17 @@ coding:utf-8
 @Author:XJC
 @Description:
 """
+import asyncio
+import functools
+from typing import Any
+
 from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
+from starlette.requests import Request
+from starlette.responses import Response
 
 from apps.common import SQLAlchemyCRUDRouter as CRUDRouter
 from apps.db import get_db
@@ -16,6 +22,17 @@ from apps.db_catlog.models import (DkDNSType, DkDnsInfo, DkCatalogTableRelationa
 from apps.db_catlog.repositories import (DkDnsTypeSchema, DkDnsSchema, DkCatalogTableRelationalSchema,
                                          DkTableSchema, DkCatalogSchema)
 from apps.db_catlog.schemas import DkDnsTypeSchemaCreate, DkTableSchemaCreate, DkDnsSchemaCreate
+
+
+def mkl(pag=None):
+    def custom_decorator(func):
+        def wrapper(skip, limit):
+            # 在这里添加自定义逻辑
+            skip, limit = pag.get("skip"), pag.get("limit")
+            return skip, limit
+
+        return wrapper
+    return custom_decorator
 
 
 class DkDnsTypeRouter:
@@ -34,12 +51,12 @@ class DkDnsRouter:
 
     @staticmethod
     @router.get('', summary='获取全部数据源')
-    async def overloaded_dk_dns_get_all(pagination=router.pagination, session=Depends(router.db_func)):
-        skip, limit = pagination.get("skip"), pagination.get("limit")
+    @mkl(pag=router.pagination)
+    async def overloaded_dk_dns_get_all(session=Depends(router.db_func)):
         query = select(DkDnsInfo).options(
-            joinedload(DkDnsInfo.datasource_type, innerjoin=True)).order_by(DkDnsInfo.id).limit(limit).offset(skip)
+            joinedload(DkDnsInfo.datasource_type_info, innerjoin=True)).order_by(DkDnsInfo.id).limit(mkl.limit).offset(mkl.skip)
         result = await session.execute(query)
-        return result.scalars().all()
+        return result.scalars().unique().all()
 
     @staticmethod
     @router.get('/{item_id}', summary='获取数据源详情')
@@ -62,7 +79,7 @@ class DkTableRouter:
         query = select(DkCatalogTable).options(joinedload(DkCatalogTable.datasource_info, innerjoin=True)).order_by(
             DkCatalogTable.id).limit(limit).offset(skip)
         result = await session.execute(query)
-        return result.scalars().all()
+        return result.scalars().unique().all()
 
     @staticmethod
     @router.get('/{item_id}', summary='获取表详情')
