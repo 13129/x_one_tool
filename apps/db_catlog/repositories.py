@@ -18,7 +18,7 @@ class DkDnsTypeSchema(BaseModelSchema):
     delete_status: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DkDnsSchema(BaseModelSchema):
@@ -38,7 +38,7 @@ class DkDnsSchema(BaseModelSchema):
     last_modify_time: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DkTableSchema(BaseModelSchema):
@@ -58,7 +58,7 @@ class DkTableSchema(BaseModelSchema):
     last_modify_time: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DkFieldSchema(BaseModelSchema):
@@ -75,7 +75,7 @@ class DkFieldSchema(BaseModelSchema):
     is_image: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DkCatalogTableRelationalSchema(BaseModelSchema):
@@ -91,7 +91,7 @@ class DkCatalogTableRelationalSchema(BaseModelSchema):
     child_info: List["DkCatalogSchema"] = []  # noqa: F401
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DkCatalogSchema(BaseModelSchema):
@@ -108,4 +108,4 @@ class DkCatalogSchema(BaseModelSchema):
     ctl_tb_relation_info: List[DkCatalogTableRelationalSchema]
 
     class Config:
-        orm_mode = True
+        from_attributes = True

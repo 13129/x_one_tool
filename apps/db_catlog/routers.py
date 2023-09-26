@@ -132,3 +132,13 @@ class DkDataQueryRouter:
         result = jsonable_encoder(result.scalars().unique().all())
 
         return JSONResponse(status_code=200, content={"success": "ok", "code": 200, "data": result})
+
+    @staticmethod
+    @router.api_route('/queryData/ggg/', methods=['GET'], summary='数据查询测试')
+    async def dk_query_data(session=Depends(router.db_func)):
+        query = select(DkCatalog).options(joinedload(DkCatalog.child_info, innerjoin=True)).order_by(
+            DkCatalog.order_no)
+        result = await session.execute(query)
+        result = jsonable_encoder(result.scalars().unique().all())
+
+        return JSONResponse(status_code=200, content={"success": "ok", "code": 200, "data": result})

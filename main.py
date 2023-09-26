@@ -44,7 +44,7 @@ async def startup_event():
 
 @app.get("/")
 async def root():
-    return {"status": "ok"}
+    print("是否请求")
 
 
 @app.get("/docs", include_in_schema=False)

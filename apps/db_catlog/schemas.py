@@ -7,6 +7,7 @@ coding:utf-8
 from pydantic import Field, BaseModel
 from ipaddress import IPv4Address
 from datetime import datetime
+from typing import List, Union
 
 
 class DkDnsTypeSchemaCreate(BaseModel):
@@ -15,7 +16,7 @@ class DkDnsTypeSchemaCreate(BaseModel):
     delete_status: bool = Field(default=True)
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DkDnsSchemaCreate(BaseModel):
@@ -31,7 +32,7 @@ class DkDnsSchemaCreate(BaseModel):
     port: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DkTableSchemaCreate(BaseModel):
@@ -49,4 +50,25 @@ class DkTableSchemaCreate(BaseModel):
     last_modifier: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+from apps.base import BaseModelSchema
+
+
+class DkCatalogTableNextSchema(BaseModelSchema):
+    name_cn: str
+    name_en: str
+    catalog_code: str
+    parent_id: str
+    order_no: int
+    is_show: bool
+    creator: str
+    create_time: datetime
+    last_modifier: str
+    last_modify_time: datetime
+    # ctl_tb_relation_info: List[DkCatalogTableRelationalSchema]
+    child_info: List["DkCatalogTableNextSchema"] = []  # noqa: F401
+
+    class Config:
+        from_attributes = True
