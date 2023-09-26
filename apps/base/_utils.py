@@ -14,8 +14,7 @@ class AttrDict(dict):  # type: ignore
 
 def get_pk_type(schema: Type[PYDANTIC_SCHEMA], pk_field: str) -> Any:
     try:
-        # print("效验", (schema.model_fields[pk_field]))
-        return schema.model_fields[pk_field].annotation
+        return schema.__fields__[pk_field].annotation
     except KeyError:
         return int
 
@@ -27,8 +26,8 @@ def schema_factory(
     Is used to create a CreateSchema which does not contain pk
     """
     fields = {
-        f: (schema_cls.model_fields[f].annotation, ...)
-        for f in schema_cls.model_fields
+        f: (schema_cls.__fields__[f].annotation, ...)
+        for f in schema_cls.__fields__
         if f != pk_field_name
     }
     name = schema_cls.__name__ + name
@@ -43,8 +42,8 @@ def delete_schema_factory(
     Is used to create a CreateSchema  pk
     """
     fields = {
-        f: (schema_cls.model_fields[f].annotation, ...)
-        for f in schema_cls.model_fields
+        f: (schema_cls.__fields__[f].annotation, ...)
+        for f in schema_cls.__fields__
         if f == pk_field_name or f == del_field_name
     }
     data = {"data": (List[create_model(__model_name=__name__ + name, **fields)], ...)}
