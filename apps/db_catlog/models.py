@@ -4,12 +4,27 @@ coding:utf-8
 @Author:XJC
 @Description:
 """
-from sqlalchemy import Column, String, DateTime, Boolean, func, Integer, Text
+from sqlalchemy import Column, String, DateTime, Boolean, func, Integer, Text, ForeignKey
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import relationship, backref, foreign
+from sqlalchemy.orm import relationship, backref, Mapped, declared_attr, declarative_mixin
 
 from apps.base import BaseModel
+
+
+@declarative_mixin
+class RefTargetMixin:
+    @declared_attr
+    def datasource_type_id(cls):
+        return Column('datasource_type_id', ForeignKey('dk_datasource_type.id'))
+
+    @declared_attr
+    def datasource_type_info(cls):
+        return relationship('DkDNSType',
+                            foreign_keys="DkDNSType.id",
+                            primaryjoin=lambda: DkDNSType.id == cls.datasource_type_id,
+                            # primaryjoin="DkDNSType.id==foreign(%s.datasource_type_id)" % cls.__name__,
+                            backref=backref('dk_datasource_info')
+                            )
 
 
 class DkDNSType(BaseModel):
@@ -19,9 +34,12 @@ class DkDNSType(BaseModel):
     delete_status = Column("delete_status", Boolean, comment="默认连接字符串", default='False', nullable=True)
 
 
-class DkDnsInfo(BaseModel):
+class DkDnsInfo( BaseModel,RefTargetMixin):
     __tablename__ = 'dk_datasource_info'
-    datasource_type_id = Column("datasource_type_id", String(50), comment="数据源类型ID")
+    # datasource_type_id = Column("datasource_type_id", String(50), comment="数据源类型ID")
+    # datasource_type_info = relationship('DkDNSType',
+    #                                     primaryjoin='foreign(DkDnsInfo.datasource_type_id) == DkDNSType.id',
+    #                                     backref=backref('dk_datasource_info'))
     datasource_name = Column("datasource_name", String(255), comment="数据源名称")
     host = Column("host", String(100), comment="数据源主机IP")
     user_name = Column("user_name", String(255), comment="用户名")
@@ -37,22 +55,24 @@ class DkDnsInfo(BaseModel):
     last_modify_time = Column("last_modify_time", DateTime, server_default=func.now(), onupdate=func.now(),
                               comment="上次修改时间")
 
-    @declared_attr
-    def datasource_type_info(self):
-        return relationship('DkDnsInfo',
-                            # primaryjoin=f'foreign({lambda: getattr(cls,'datasource_type_id')}) == DkDNSType.id',
-                            primaryjoin='foreign(DkDnsInfo.datasource_type_id) == DkDNSType.id',
-                            backref=backref('DkDnsInfo'))
-
 
 class DkCatalogTable(BaseModel):
     __tablename__ = 'dk_catalog_table'
     datasource_id = Column("datasource_id", String(255), comment="数据源ID")
+    datasource_info = relationship('DkDnsInfo',
+                                   primaryjoin='foreign(DkCatalogTable.datasource_id) == DkDnsInfo.id',
+                                   backref=backref('dk_catalog_table'))
     name = Column("name", String(128), comment="表中文名")
     physical_table_name = Column("physical_table_name", String(128), comment="物理表名")
     logic_table_name = Column("logic_table_name", String(128), comment="逻辑表名")
     table_name_alias = Column("table_name_alias", String(255), comment="表中文别名")
     table_code = Column("table_code", Integer, comment="表编码")
+    field_info = relationship('DkCatalogField',
+                              primaryjoin='DkCatalogTable.table_code==foreign(DkCatalogField.table_code)',
+                              backref=backref('dk_catalog_table'))
+
+    catalog_info_proxy = association_proxy("ctl_tb_relation_info", "catalog_info")
+
     table_type = Column("table_type", String(64), comment="表类型")
     is_open = Column("is_open", Boolean, default=True, comment="是否公开;1-公开;0不公开")
     is_edit = Column("is_edit", Boolean, default=False, comment="是否可编辑;1-可编辑;0不可编辑")
@@ -65,22 +85,6 @@ class DkCatalogTable(BaseModel):
 
     def __init__(self, dk_catalog_table):
         self.dk_catalog_table = dk_catalog_table
-
-    @declared_attr
-    def datasource_info(cls):
-        return relationship('DkDnsInfo',
-                            primaryjoin='foreign(DkCatalogTable.datasource_id) == DkDnsInfo.id',
-                            backref=backref('dk_catalog_table'))
-
-    @declared_attr
-    def field_info(cls):
-        return relationship('DkCatalogTable',
-                            primaryjoin='DkCatalogTable.table_code==foreign(DkCatalogField.table_code)',
-                            backref=backref('dk_catalog_table'))
-
-    @declared_attr
-    def catalog_info_proxy(self):
-        return association_proxy("ctl_tb_relation_info", "catalog_info")
 
 
 class DkCatalogField(BaseModel):
@@ -109,6 +113,11 @@ class DkCatalog(BaseModel):
     name_en = Column("name_en", String(128), comment="英文名")
     catalog_code = Column("catalog_code", String(128), comment="目录编码")
     parent_id = Column("parent_id", String(255), comment="父级")
+    child_info = relationship("DkCatalog",
+                              primaryjoin='DkCatalog.id==foreign(DkCatalog.parent_id)',
+                              backref=backref('dk_catalog', remote_side='DkCatalog.id'))
+
+    table_info_proxy = association_proxy("ctl_tb_relation_info", "table_info")
     order_no = Column("order_no", Integer, comment="排序")
     is_show = Column("is_show", Boolean, default=True, comment="是否显示:1显示;0不显示")
     creator = Column("creator", String(255), comment="创建者")
@@ -116,16 +125,6 @@ class DkCatalog(BaseModel):
     last_modifier = Column("last_modifier", String(255), comment="上次修改用户")
     last_modify_time = Column("last_modify_time", DateTime, server_default=func.now(), onupdate=func.now(),
                               comment="上次修改时间")
-
-    @declared_attr
-    def child_info(self):
-        return relationship('DkCatalog',
-                            primaryjoin='DkCatalog.id==foreign(DkCatalog.parent_id)',
-                            backref=backref('dk_catalog', remote_side='DkCatalog.id'))
-
-    @declared_attr
-    def table_info_proxy(self):
-        return association_proxy("ctl_tb_relation_info", "table_info")
 
 
 class DkCatalogTableRelational(BaseModel):
@@ -139,15 +138,9 @@ class DkCatalogTableRelational(BaseModel):
     last_modifier = Column("last_modifier", String(255), comment="上次修改用户")
     last_modify_time = Column("last_modify_time", DateTime, server_default=func.now(), onupdate=func.now(),
                               comment="上次修改时间")
-
-    @declared_attr
-    def catalog_info(self):
-        return relationship("DkCatalog",
-                            primaryjoin='foreign(dk_catalog_table_relational_info.c.catalog_code_id)==DkCatalog.id',
-                            backref=backref("ctl_tb_relation_info"))
-
-    @declared_attr
-    def table_info(self):
-        return relationship("DkCatalogTable",
-                            primaryjoin='foreign(dk_catalog_table_relational_info.c.tabl_code_id)==DkCatalogTable.id',
-                            backref=backref('ctl_tb_relation_info'))
+    catalog_info = relationship("DkCatalog",
+                                primaryjoin='foreign(dk_catalog_table_relational_info.c.catalog_code_id)==DkCatalog.id',
+                                backref=backref("ctl_tb_relation_info"))
+    table_info = relationship("DkCatalogTable",
+                              primaryjoin='foreign(dk_catalog_table_relational_info.c.tabl_code_id)==DkCatalogTable.id',
+                              backref=backref('ctl_tb_relation_info'))
