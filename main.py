@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
 from apps.db_catlog import db_c_api as db_c_api
+from apps.test import snowy_app_router
 from setting import settings
 
 os.environ["TZ"] = settings.TIMEZONE
@@ -32,6 +33,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(snowy_app_router, prefix=settings.API_V1_STR)
 app.include_router(db_c_api, prefix=settings.API_V1_STR)
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
@@ -93,4 +96,4 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 if __name__ == '__main__':
-    uvicorn.run(app='main:app', reload=True, workers=3)
+    uvicorn.run(app='main:app', reload=True, workers=3,port=8888)

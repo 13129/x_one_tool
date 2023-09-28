@@ -4,17 +4,12 @@ coding:utf-8
 @Author:XJC
 @Description:
 """
-import asyncio
-import functools
-from typing import Any
 
 from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
-from starlette.requests import Request
-from starlette.responses import Response
 
 from apps.common import SQLAlchemyCRUDRouter as CRUDRouter
 from apps.db import get_db
@@ -24,17 +19,6 @@ from apps.db_catlog.repositories import (DkDnsTypeSchema, DkDnsSchema, DkCatalog
 from apps.db_catlog.schemas import DkDnsTypeSchemaCreate, DkTableSchemaCreate, DkDnsSchemaCreate
 
 
-def mkl(pag=None):
-    def custom_decorator(func):
-        def wrapper(skip, limit):
-            # 在这里添加自定义逻辑
-            skip, limit = pag.get("skip"), pag.get("limit")
-            return skip, limit
-
-        return wrapper
-    return custom_decorator
-
-
 class DkDnsTypeRouter:
     router = CRUDRouter(schema=DkDnsTypeSchema, create_schema=DkDnsTypeSchemaCreate, db_model=DkDNSType,
                         db=get_db,
@@ -42,7 +26,6 @@ class DkDnsTypeRouter:
                         tags=["元数据"], prefix='dataDnsTypes')
 
 
-# @cbv(dk_dns_router)
 class DkDnsRouter:
     router = CRUDRouter(schema=DkDnsSchema, create_schema=DkDnsSchemaCreate, db_model=DkDnsInfo,
                         db=get_db,
@@ -51,10 +34,11 @@ class DkDnsRouter:
 
     @staticmethod
     @router.get('', summary='获取全部数据源')
-    @mkl(pag=router.pagination)
-    async def overloaded_dk_dns_get_all(session=Depends(router.db_func)):
+    async def overloaded_dk_dns_get_all(pagination=router.pagination, session=Depends(router.db_func)):
+        limit, skip = pagination.get('limit'), pagination.get('skip')
         query = select(DkDnsInfo).options(
-            joinedload(DkDnsInfo.datasource_type_info, innerjoin=True)).order_by(DkDnsInfo.id).limit(mkl.limit).offset(mkl.skip)
+            joinedload(DkDnsInfo.datasource_type_info, innerjoin=True)).order_by(DkDnsInfo.id).limit(
+            limit).offset(skip)
         result = await session.execute(query)
         return result.scalars().unique().all()
 
@@ -75,7 +59,7 @@ class DkTableRouter:
     @staticmethod
     @router.get('', summary='获取所有表列表')
     async def overloaded_dk_table_get_all(pagination=router.pagination, session=Depends(router.db_func)):
-        skip, limit = pagination.get("skip"), pagination.get("limit")
+        limit, skip = pagination.get('limit'), pagination.get('skip')
         query = select(DkCatalogTable).options(joinedload(DkCatalogTable.datasource_info, innerjoin=True)).order_by(
             DkCatalogTable.id).limit(limit).offset(skip)
         result = await session.execute(query)
@@ -145,6 +129,16 @@ class DkDataQueryRouter:
             joinedload(DkCatalog.ctl_tb_relation_info, innerjoin=True).options(
                 joinedload(DkCatalogTableRelational.table_info).options(joinedload(DkCatalog.datasource_info))))
 
+        result = await session.execute(query)
+        result = jsonable_encoder(result.scalars().unique().all())
+
+        return JSONResponse(status_code=200, content={"success": "ok", "code": 200, "data": result})
+
+    @staticmethod
+    @router.api_route('/queryData/ggg/', methods=['GET'], summary='数据查询测试')
+    async def dk_query_data(session=Depends(router.db_func)):
+        query = select(DkCatalog).options(joinedload(DkCatalog.child_info, innerjoin=True)).order_by(
+            DkCatalog.order_no)
         result = await session.execute(query)
         result = jsonable_encoder(result.scalars().unique().all())
 
