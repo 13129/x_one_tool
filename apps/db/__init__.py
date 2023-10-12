@@ -15,3 +15,9 @@ async def get_db() -> AsyncSession:
     async with async_session() as ay_session:
         yield ay_session
         await ay_session.commit()
+
+
+__all__ = [
+    "async_session",
+    "get_db"
+]

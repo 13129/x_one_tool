@@ -5,9 +5,10 @@ coding:utf-8
 @Description:
 """
 from __future__ import annotations
+
 from datetime import datetime
 from ipaddress import IPv4Address
-from typing import List, Union
+from typing import List
 
 from apps.base import BaseModelSchema
 
@@ -39,6 +40,10 @@ class DkDnsSchema(BaseModelSchema):
 
     class Config:
         from_attributes = True
+
+    # @field_serializer('host')
+    # def serialize_dt(self, host: IPv4Address, _info):
+    #     return str(host)
 
 
 class DkTableSchema(BaseModelSchema):

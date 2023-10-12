@@ -10,7 +10,6 @@ from fastapi.openapi.docs import (
 from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
-
 from apps.db_catlog import db_c_api as db_c_api
 from setting import settings
 
@@ -36,6 +35,29 @@ app.include_router(db_c_api, prefix=settings.API_V1_STR)
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
 
+# from sqladmin import Admin, ModelView
+# from apps.test.models import DbTestModel
+# from apps.db import async_session
+#
+# admin = Admin(app, session_maker=async_session, debug=True)
+
+
+# class UserAdmin(ModelView, model=DbTestModel):
+#     name = "User"
+#     name_plural = "Users"
+#     icon = "fa-solid fa-user"
+#     category = "accounts"
+#
+#     can_view_details = True
+#     can_edit = True
+#     column_list = ["type_name"]
+#     column_details_list = ["type_name"]
+#
+#
+#
+# admin.add_model_view(UserAdmin)
+
+
 @app.on_event("startup")
 async def startup_event():
     print("-----启动应用程序啦-----")
@@ -44,12 +66,11 @@ async def startup_event():
 
 @app.get("/")
 async def root():
-    print("是否请求")
+    return {"status": "ok"}
 
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
-
     return get_swagger_ui_html(
         openapi_url=app.openapi_url,
         title=app.title + " - Swagger UI",
@@ -94,4 +115,4 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 if __name__ == '__main__':
-    uvicorn.run(app='main:app', reload=True, workers=3)
+    uvicorn.run(app='main:app', reload=True, workers=1)

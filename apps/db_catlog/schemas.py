@@ -4,10 +4,19 @@ coding:utf-8
 @Author:XJC
 @Description:
 """
-from pydantic import Field, BaseModel
+import uuid
+
+from pydantic import Field, BaseModel, field_validator
 from ipaddress import IPv4Address
 from datetime import datetime
-from typing import List, Union
+from typing import List
+from pydantic.functional_serializers import PlainSerializer
+
+from typing_extensions import Annotated
+
+FancyInt = Annotated[
+    IPv4Address, PlainSerializer(lambda x: str(x), return_type=str, when_used='json')
+]
 
 
 class DkDnsTypeSchemaCreate(BaseModel):
@@ -30,9 +39,15 @@ class DkDnsSchemaCreate(BaseModel):
     default_db: str
     driver_file_path: str
     port: int
+    creator: str
+    last_modifier: str
 
     class Config:
         from_attributes = True
+
+    @field_validator('host')
+    def name_must_contain_space(cls, v):
+        return str(v)
 
 
 class DkTableSchemaCreate(BaseModel):

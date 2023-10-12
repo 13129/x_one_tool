@@ -1,6 +1,7 @@
 from typing import Any, Callable, List, Type, Generator, Optional, Union
 
 from fastapi import Depends, HTTPException
+from sqlalchemy import insert
 
 from apps.base import CRUDGenerator, NOT_FOUND
 from apps.base import DEPENDENCIES, PAGINATION, PYDANTIC_SCHEMA as SCHEMA
@@ -111,16 +112,23 @@ class SQLAlchemyCRUDRouter(CRUDGenerator[SCHEMA]):
     def _create(self, *args: Any, **kwargs: Any) -> CALLABLE:
         async def route(
                 model: self.create_schema,  # type: ignore
-                db: Session = Depends(self.db_func),
+                db: Session = Depends(self.db_func)
         ) -> Model:
             try:
+
                 db_model: Model = self.db_model(**model.dict())
                 db.add(db_model)
                 await db.flush()
+                # await db.commit()
                 db.expunge(db_model)
+
                 return db_model
+                # db_model = insert(self.db_model).values(**model.dict())
+                # last_record_id = await db.execute(db_model)
+                # print({"id": last_record_id})
+                # return None
             except IntegrityError:
-                db.rollback()
+                await db.rollback()
                 raise HTTPException(422, "Key already exists") from None
 
         return route
@@ -143,7 +151,7 @@ class SQLAlchemyCRUDRouter(CRUDGenerator[SCHEMA]):
 
                 return db_model
             except IntegrityError as e:
-                db.rollback()
+                await db.rollback()
                 self._raise(e)
 
         return route
@@ -162,7 +170,7 @@ class SQLAlchemyCRUDRouter(CRUDGenerator[SCHEMA]):
                     db.expunge(db_model)
                     return db_model
                 except IntegrityError as e:
-                    db.rollback()
+                    await db.rollback()
                     self._raise(e)
             else:
                 return None

@@ -82,7 +82,7 @@ class CRUDGenerator(Generic[T], APIRouter, ABC):
                 "",
                 self._create(),
                 methods=["POST"],
-                response_model=self.schema,
+                response_model=self.create_schema if self.create_schema else self.schema,
                 summary="Create One",
                 dependencies=create_route,
             )

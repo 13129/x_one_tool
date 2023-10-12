@@ -1,4 +1,4 @@
 alembic init alembic
-alembic revision -m "update account Table Columns"
+alembic revision -m "add db_test"
 alembic upgrade head
-alembic revision --autogenerate -m "update account Table Columns"
+alembic revision --autogenerate -m "add db_test224"

@@ -4,25 +4,25 @@ coding:utf-8
 @Author:XJC
 @Description:
 """
-from sqlalchemy import Column, String, DateTime, Boolean, func, Integer, Text, ForeignKey
+from sqlalchemy import Column, String, DateTime, Boolean, func, Integer, Text
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relationship, backref, Mapped, declared_attr, declarative_mixin
+from sqlalchemy.orm import relationship, backref, declared_attr, declarative_mixin
 
 from apps.base import BaseModel
 
 
 @declarative_mixin
 class RefTargetMixin:
-    @declared_attr
-    def datasource_type_id(cls):
-        return Column('datasource_type_id', ForeignKey('dk_datasource_type.id'))
+    # @declared_attr
+    # def datasource_type_id(cls):
+    #     return Column('datasource_type_id', ForeignKey('dk_datasource_type.id'))
 
     @declared_attr
     def datasource_type_info(cls):
         return relationship('DkDNSType',
-                            foreign_keys="DkDNSType.id",
-                            primaryjoin=lambda: DkDNSType.id == cls.datasource_type_id,
-                            # primaryjoin="DkDNSType.id==foreign(%s.datasource_type_id)" % cls.__name__,
+                            # foreign_keys="DkDNSType.id",
+                            # primaryjoin=lambda: DkDNSType.id == cls.datasource_type_id,
+                            primaryjoin="DkDNSType.id==foreign(%s.datasource_type_id)" % cls.__name__,
                             backref=backref('dk_datasource_info')
                             )
 
@@ -34,9 +34,9 @@ class DkDNSType(BaseModel):
     delete_status = Column("delete_status", Boolean, comment="默认连接字符串", default='False', nullable=True)
 
 
-class DkDnsInfo( BaseModel,RefTargetMixin):
+class DkDnsInfo(BaseModel, RefTargetMixin):
     __tablename__ = 'dk_datasource_info'
-    # datasource_type_id = Column("datasource_type_id", String(50), comment="数据源类型ID")
+    datasource_type_id = Column("datasource_type_id", String(50), comment="数据源类型ID")
     # datasource_type_info = relationship('DkDNSType',
     #                                     primaryjoin='foreign(DkDnsInfo.datasource_type_id) == DkDNSType.id',
     #                                     backref=backref('dk_datasource_info'))

@@ -14,3 +14,4 @@ from apps.db_catlog.models import DkCatalogField  # noqa: F401
 from apps.db_catlog.models import DkCatalog  # noqa: F401
 from apps.db_catlog.models import DkDNSType  # noqa: F401
 from apps.db_catlog.models import DkCatalogTableRelational  # noqa: F401
+from apps.test.models import DbTestModel  # noqa: F401

@@ -12,7 +12,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from apps.common import SQLAlchemyCRUDRouter as CRUDRouter
-from apps.common.generic_extensions import parse_pagination
 from apps.db import get_db
 from apps.db_catlog.models import (DkDNSType, DkDnsInfo, DkCatalogTableRelational, DkCatalogTable, DkCatalog)
 from apps.db_catlog.repositories import (DkDnsTypeSchema, DkDnsSchema, DkCatalogTableRelationalSchema,
@@ -35,11 +34,11 @@ class DkDnsRouter:
 
     @staticmethod
     @router.get('', summary='获取全部数据源')
-    @parse_pagination(pag=router.pagination)
-    async def overloaded_dk_dns_get_all(session=Depends(router.db_func)):
+    async def overloaded_dk_dns_get_all(pagination=router.pagination, session=Depends(router.db_func)):
+        limit, skip = pagination.get('limit'), pagination.get('skip')
         query = select(DkDnsInfo).options(
             joinedload(DkDnsInfo.datasource_type_info, innerjoin=True)).order_by(DkDnsInfo.id).limit(
-            parse_pagination.limit).offset(parse_pagination.skip)
+            limit).offset(skip)
         result = await session.execute(query)
         return result.scalars().unique().all()
 
@@ -51,6 +50,15 @@ class DkDnsRouter:
         result = await session.execute(query)
         return result.scalars().all()
 
+    # @staticmethod
+    # @router.post('', summary='新增数据源')
+    # async def overloaded_dk_dns_create_one(model: dict = router.create_schema, session=Depends(router.db_func)):
+    #     item = DkDnsInfo(**model)
+    #     session.add(item)
+    #     await session.commit()
+    #     await session.refresh(item)
+    #     return item
+
 
 class DkTableRouter:
     router = CRUDRouter(schema=DkTableSchema, create_schema=DkTableSchemaCreate, db_model=DkCatalogTable,
@@ -59,11 +67,10 @@ class DkTableRouter:
 
     @staticmethod
     @router.get('', summary='获取所有表列表')
-    @parse_pagination(pag=router.pagination)
-    async def overloaded_dk_table_get_all(session=Depends(router.db_func)):
-        # skip, limit = pagination.get("skip"), pagination.get("limit")
+    async def overloaded_dk_table_get_all(pagination=router.pagination, session=Depends(router.db_func)):
+        limit, skip = pagination.get('limit'), pagination.get('skip')
         query = select(DkCatalogTable).options(joinedload(DkCatalogTable.datasource_info, innerjoin=True)).order_by(
-            DkCatalogTable.id).limit(parse_pagination.limit).offset(parse_pagination.skip)
+            DkCatalogTable.id).limit(limit).offset(skip)
         result = await session.execute(query)
         return result.scalars().unique().all()
 

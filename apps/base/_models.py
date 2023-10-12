@@ -4,18 +4,22 @@ coding:utf-8
 @Author:XJC
 @Description:
 """
+
 import uuid
+
 from sqlalchemy import Column
 from sqlalchemy import String
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
 
+def uuid_hex():
+    return str(uuid.uuid4().hex)
+
+
 @as_declarative()
 class BaseModel:
-    id = Column(String(64), primary_key=True, default=str(uuid.uuid4()))
-    __name__: str
+    id = Column(String(64), primary_key=True, default=uuid_hex)
 
-    # Generate __tablename__ automatically
     @declared_attr
     def __tablename__(cls) -> str:
         return cls.__name__.lower()

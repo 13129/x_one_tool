@@ -11,7 +11,7 @@ from setting import settings
 
 engine = create_async_engine(
     settings.async_database_url,
-    echo=settings.DB_ECHO_LOG,
+    echo=settings.DB_ECHO_LOG, connect_args={"check_same_thread": False}
 
 )
-async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False,future=True)
+async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False, future=True)
