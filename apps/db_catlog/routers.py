@@ -20,6 +20,9 @@ from apps.db_catlog.schemas import DkDnsTypeSchemaCreate, DkTableSchemaCreate, D
 
 
 class DkDnsTypeRouter:
+    """
+    用于管理数据源驱动的增删改查
+    """
     router = CRUDRouter(schema=DkDnsTypeSchema, create_schema=DkDnsTypeSchemaCreate, db_model=DkDNSType,
                         db=get_db,
                         update_route=False, delete_all_route=False, delete_one_route=False,
@@ -27,6 +30,9 @@ class DkDnsTypeRouter:
 
 
 class DkDnsRouter:
+    """
+    用于管理数据源的增删改查
+    """
     router = CRUDRouter(schema=DkDnsSchema, create_schema=DkDnsSchemaCreate, db_model=DkDnsInfo,
                         db=get_db,
                         tags=["数据源"], prefix='dataDns',
@@ -50,17 +56,11 @@ class DkDnsRouter:
         result = await session.execute(query)
         return result.scalars().all()
 
-    # @staticmethod
-    # @router.post('', summary='新增数据源')
-    # async def overloaded_dk_dns_create_one(model: dict = router.create_schema, session=Depends(router.db_func)):
-    #     item = DkDnsInfo(**model)
-    #     session.add(item)
-    #     await session.commit()
-    #     await session.refresh(item)
-    #     return item
-
 
 class DkTableRouter:
+    """
+    用于管理表元数据的增删改查
+    """
     router = CRUDRouter(schema=DkTableSchema, create_schema=DkTableSchemaCreate, db_model=DkCatalogTable,
                         db=get_db,
                         get_all_route=False, tags=["表管理"], prefix='dataTables')
@@ -77,7 +77,7 @@ class DkTableRouter:
     @staticmethod
     @router.get('/{item_id}', summary='获取表详情')
     async def overloaded_dk_table_get_one(item_id=None, session=Depends(router.db_func)):
-        query = select(DkCatalogTable).options(joinedload(DkCatalogTable.field_info, innerjoin=True)).options(
+        query = select(DkCatalogTable).options(joinedload(DkCatalogTable.field_info, innerjoin=False)).options(
             joinedload(DkCatalogTable.datasource_info, innerjoin=True)).where(DkCatalogTable.id == item_id)
 
         result = await session.execute(query)
@@ -85,6 +85,9 @@ class DkTableRouter:
 
 
 class DkCatalogRouter:
+    """
+    用于管理目录的增删改查
+    """
     router = CRUDRouter(schema=DkCatalogSchema, db_model=DkCatalog, db=get_db, tags=["目录管理"], prefix='dataCatalogs')
 
     @staticmethod
@@ -119,12 +122,18 @@ class DkCatalogRouter:
 
 
 class DkCatalogTableRelationalRouter:
+    """
+    用于管理目录关联表的增删改查
+    """
     router = CRUDRouter(schema=DkCatalogTableRelationalSchema, db_model=DkCatalogTableRelational,
                         db=get_db, get_all_route=False, get_one_route=False,
                         tags=["目录关联管理"], prefix='catalogTableRelations')
 
 
 class DkDataQueryRouter:
+    """
+    用于管理所有数据表数据的增删改查
+    """
     router = CRUDRouter(schema=DkCatalogSchema, db_model=DkCatalog, db=get_db, tags=["数据检索服务"],
                         prefix='/dataPools')
 
