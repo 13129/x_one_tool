@@ -35,27 +35,6 @@ app.add_middleware(
 app.include_router(db_c_api, prefix=settings.API_V1_STR)
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
-from sqladmin import Admin, ModelView
-from apps.db_catlog.models import DkDNSType
-from apps.db import async_session
-
-admin = Admin(app, session_maker=async_session, debug=True)
-
-
-class UserAdmin(ModelView, model=DkDNSType):
-    name = "元数据"
-    name_plural = "元数据"
-    icon = "fa-solid fa-user"
-    category = "资源管理"
-
-    can_view_details = True
-    can_edit = True
-    column_list = "__all__"
-    column_details_list = "__all__"
-
-
-admin.add_model_view(UserAdmin)
-
 
 @app.on_event("startup")
 async def startup_event():

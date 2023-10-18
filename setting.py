@@ -35,6 +35,7 @@ class GlobalConfig(BaseConfig):
 
     DATABASE_URL: Optional[FilePath] = os.path.join(BASE_DIR, "db.sqlite3")
     DB_ECHO_LOG: bool = False
+    DB_LOGGING_NAME: str = 'DBTool'
 
     @property
     def async_database_url(self) -> Optional[str]:
