@@ -9,11 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 sys.path = ["", ".."] + sys.path[1:]  # TODO: Fix it
 
 from setting import settings  # noqa
-from apps.db.database import BaseModel  # noqa
+from apps.db.database import DBBaseModel  # noqa
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
-target_metadata = BaseModel.metadata
+target_metadata = DBBaseModel.metadata
 
 fileConfig(config.config_file_name)
 

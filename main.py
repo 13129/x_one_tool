@@ -9,6 +9,7 @@ from fastapi.openapi.docs import (
 )
 from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
+from fastapi_pagination import add_pagination
 from starlette.middleware.cors import CORSMiddleware
 
 from apps.db_catlog import db_c_api as db_c_api
@@ -24,7 +25,13 @@ app = FastAPI(
     redoc_url=None,
     # openapi_url=None,
 )
-
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://127.0.0.1:8080",
+]
+add_pagination(app)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -32,39 +39,26 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+from fastapi_profiler import PyInstrumentProfilerMiddleware
+from apps.test import db_test_api
+
+app.add_middleware(
+    PyInstrumentProfilerMiddleware
+)
+
 app.include_router(db_c_api, prefix=settings.API_V1_STR)
+app.include_router(db_test_api, prefix=settings.API_V1_STR)
 app.mount('/static', StaticFiles(directory='static'), name='static')
-
-from sqladmin import Admin, ModelView
-from apps.db_catlog.models import DkDNSType
-from apps.db import async_session
-
-admin = Admin(app, session_maker=async_session, debug=True)
-
-
-class UserAdmin(ModelView, model=DkDNSType):
-    name = "元数据"
-    name_plural = "元数据"
-    icon = "fa-solid fa-user"
-    category = "资源管理"
-
-    can_view_details = True
-    can_edit = True
-    column_list = "__all__"
-    column_details_list = "__all__"
-
-
-admin.add_model_view(UserAdmin)
 
 
 @app.on_event("startup")
 async def startup_event():
     print("-----启动应用程序啦-----")
-    # print("-----启动数据库可用性检查-----")
+    print("-----启动数据库可用性检查-----")
 
 
 @app.get('/')
-def root():
+async def root():
     return {"status": "ok"}
 
 

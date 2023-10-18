@@ -1,20 +1,20 @@
 from typing import Any, Callable, List, Type, Generator, Optional, Union
 
 from fastapi import Depends, HTTPException
-from sqlalchemy import insert
-
 from apps.base import CRUDGenerator, NOT_FOUND
 from apps.base import DEPENDENCIES, PAGINATION, PYDANTIC_SCHEMA as SCHEMA
 from apps.base import get_pk_type
 
 try:
     from sqlalchemy.orm import Session
+    from sqlalchemy.ext.asyncio import AsyncSession
     from sqlalchemy import select
-    from sqlalchemy.ext.declarative import DeclarativeMeta as Model
+    from sqlalchemy.ext.declarative import DeclarativeMeta as Model, DeclarativeMeta
     from sqlalchemy.exc import IntegrityError
 except ImportError:
     Model = None
     Session = None
+    AsyncSession = None
     IntegrityError = None
     sqlalchemy_installed = False
 else:
@@ -30,7 +30,7 @@ class SQLAlchemyCRUDRouter(CRUDGenerator[SCHEMA]):
             self,
             schema: Type[SCHEMA],
             db_model: Model,
-            db: "Session",
+            db: Callable[..., "AsyncSession"],
             create_schema: Optional[Type[SCHEMA]] = None,
             update_schema: Optional[Type[SCHEMA]] = None,
             delete_schema: Optional[Type[SCHEMA]] = None,
@@ -89,7 +89,6 @@ class SQLAlchemyCRUDRouter(CRUDGenerator[SCHEMA]):
             skip, limit = pagination.get("skip"), pagination.get("limit")
             query = select(self.db_model).order_by(getattr(self.db_model, self._pk)).limit(limit).offset(skip)
             result = await db.execute(query)
-
             db_models: List[Model] = (result.scalars().all())
             return db_models
 

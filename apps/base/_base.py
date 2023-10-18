@@ -92,8 +92,8 @@ class CRUDGenerator(Generic[T], APIRouter, ABC):
                 "",
                 self._delete_all(),
                 methods=["DELETE"],
-                # response_model=Optional[List[self.schema]],  # type: ignore
-                response_model=self.schema,
+                response_model=Optional[List[self.schema]],  # type: ignore
+                # response_model=self.schema,
                 summary="Delete All",
                 dependencies=delete_all_route,
             )

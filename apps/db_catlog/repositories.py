@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from ipaddress import IPv4Address
-from typing import List
+from typing import List, Union, Dict
 
 from apps.base import BaseModelSchema
 
@@ -23,7 +23,8 @@ class DkDnsTypeSchema(BaseModelSchema):
 
 
 class DkDnsSchema(BaseModelSchema):
-    datasource_type_id: DkDnsTypeSchema
+    datasource_type_info: DkDnsTypeSchema
+    datasource_type_id: str
     datasource_name: str
     host: IPv4Address
     user_name: str
@@ -33,17 +34,13 @@ class DkDnsSchema(BaseModelSchema):
     default_db: str
     driver_file_path: str
     port: int
-    creator: str
+    creator: Union[str, None]
     create_time: datetime
-    last_modifier: str
+    last_modifier: Union[str, None]
     last_modify_time: datetime
 
     class Config:
         from_attributes = True
-
-    # @field_serializer('host')
-    # def serialize_dt(self, host: IPv4Address, _info):
-    #     return str(host)
 
 
 class DkTableSchema(BaseModelSchema):

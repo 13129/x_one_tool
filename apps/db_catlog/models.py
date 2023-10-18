@@ -6,9 +6,9 @@ coding:utf-8
 """
 from sqlalchemy import Column, String, DateTime, Boolean, func, Integer, Text
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relationship, backref, declared_attr, declarative_mixin
+from sqlalchemy.orm import relationship, backref, declared_attr, declarative_mixin, Relationship
 
-from apps.base import BaseModel
+from apps.base import DBBaseModel
 
 
 @declarative_mixin
@@ -48,6 +48,10 @@ class CatalogRefTargetMixin:
                             primaryjoin='DkCatalog.id==foreign(DkCatalog.parent_id)',
                             backref=backref('dk_catalog', remote_side='DkCatalog.id'))
 
+    @declared_attr
+    def table_info_proxy(self):
+        return association_proxy("ctl_tb_relation_info", "table_info")
+
 
 @declarative_mixin
 class CatalogTableRRefTargetMixin:
@@ -64,7 +68,7 @@ class CatalogTableRRefTargetMixin:
                             backref=backref('ctl_tb_relation_info'))
 
 
-class DkDNSType(BaseModel):
+class DkDNSType(DBBaseModel):
     __tablename__ = 'dk_datasource_type'
     type_name = Column("type_name", String(50), comment="数据源类型名称")
     is_async = Column("is_async", Boolean, default=False, comment="是否异步")
@@ -73,7 +77,7 @@ class DkDNSType(BaseModel):
     delete_status = Column("delete_status", Boolean, comment="是否删除", default='True', nullable=True)
 
 
-class DkDnsInfo(BaseModel, DnsInfoRefTargetMixin):
+class DkDnsInfo(DBBaseModel, DnsInfoRefTargetMixin):
     __tablename__ = 'dk_datasource_info'
     datasource_type_id = Column("datasource_type_id", String(50), comment="数据源类型ID")
     datasource_name = Column("datasource_name", String(255), comment="数据源名称")
@@ -92,7 +96,7 @@ class DkDnsInfo(BaseModel, DnsInfoRefTargetMixin):
                               comment="上次修改时间")
 
 
-class DkCatalogTable(BaseModel, CatalogTableRefTargetMixin):
+class DkCatalogTable(DBBaseModel, CatalogTableRefTargetMixin):
     __tablename__ = 'dk_catalog_table'
     datasource_id = Column("datasource_id", String(255), comment="数据源ID")
     name = Column("name", String(128), comment="表中文名")
@@ -111,7 +115,7 @@ class DkCatalogTable(BaseModel, CatalogTableRefTargetMixin):
                               comment="上次修改时间")
 
 
-class DkCatalogField(BaseModel):
+class DkCatalogField(DBBaseModel):
     __tablename__ = 'dk_catalog_field'
     table_code = Column("table_code", Integer, comment="表编码")
     physical_table_name = Column("physical_table_name", String(128), comment="物理表名")
@@ -131,13 +135,12 @@ class DkCatalogField(BaseModel):
                               comment="上次修改时间")
 
 
-class DkCatalog(BaseModel, CatalogRefTargetMixin):
+class DkCatalog(DBBaseModel, CatalogRefTargetMixin):
     __tablename__ = 'dk_catalog'
     name_cn = Column("name_cn", String(128), comment="中文名")
     name_en = Column("name_en", String(128), comment="英文名")
     catalog_code = Column("catalog_code", String(128), comment="目录编码")
     parent_id = Column("parent_id", String(255), comment="父级")
-    table_info_proxy = association_proxy("ctl_tb_relation_info", "table_info")
     order_no = Column("order_no", Integer, comment="排序")
     is_show = Column("is_show", Boolean, default=True, comment="是否显示:1显示;0不显示")
     creator = Column("creator", String(255), comment="创建者")
@@ -147,7 +150,7 @@ class DkCatalog(BaseModel, CatalogRefTargetMixin):
                               comment="上次修改时间")
 
 
-class DkCatalogTableRelational(BaseModel, CatalogTableRRefTargetMixin):
+class DkCatalogTableRelational(DBBaseModel, CatalogTableRRefTargetMixin):
     __tablename__ = 'dk_catalog_table_relational_info'
     catalog_code_id = Column("catalog_code_id", String(128), comment="目录编码ID")
     tabl_code_id = Column("tabl_code_id", String(128), comment="表编码ID")

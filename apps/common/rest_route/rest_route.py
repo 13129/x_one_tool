@@ -68,7 +68,7 @@ def RestRoute(path: str,
 
 
 def RestRouteGet(path: str,
-                 methods: Optional[List[str]] = ["GET"],
+                 methods: Optional[List[str]] = ("GET",),
                  response_model: Optional[Type[Any]] = None,
                  status_code: Optional[int] = None,
                  tags: Optional[List[Union[str, Enum]]] = None,

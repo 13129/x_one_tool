@@ -6,6 +6,7 @@ coding:utf-8
 """
 from sqlalchemy.ext.asyncio import AsyncSession
 from apps.db.db_session import async_session
+from apps.db.db_session import _engine as async_engine
 
 
 async def get_db() -> AsyncSession:
@@ -19,5 +20,6 @@ async def get_db() -> AsyncSession:
 
 __all__ = [
     "async_session",
-    "get_db"
+    "get_db",
+    "async_engine"
 ]

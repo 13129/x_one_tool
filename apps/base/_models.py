@@ -17,9 +17,9 @@ def uuid_hex():
 
 
 @as_declarative()
-class BaseModel:
+class DBBaseModel:
     id = Column(String(64), primary_key=True, default=uuid_hex)
 
     @declared_attr
-    def __tablename__(cls) -> str:
-        return cls.__name__.lower()
+    def __tablename__(self) -> str:
+        return self.__name__.lower()

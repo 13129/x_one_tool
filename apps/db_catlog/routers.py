@@ -5,9 +5,12 @@ coding:utf-8
 @Description:
 """
 
-from fastapi import Depends
+from fastapi import Depends, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from fastapi_pagination import LimitOffsetPage, Page
+from fastapi_pagination.ext.async_sqlalchemy import paginate
+# from apps.common.pagination import Page
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
@@ -25,8 +28,26 @@ class DkDnsTypeRouter:
     """
     router = CRUDRouter(schema=DkDnsTypeSchema, create_schema=DkDnsTypeSchemaCreate, db_model=DkDNSType,
                         db=get_db,
-                        update_route=False, delete_all_route=False, delete_one_route=False,
+                        update_route=False, delete_all_route=False, delete_one_route=False, get_all_route=True,
                         tags=["元数据"], prefix='dataDnsTypes')
+
+    # LimitOffsetPage = LimitOffsetPage.with_custom_options(limit=Query(10, ge=1, le=100,
+    #                                                                   description="Page size limit"))
+
+    # @staticmethod
+    # @router.get('', summary='获取全部元数据', response_model=LimitOffsetPage[router.schema])
+    # async def overloaded_dk_dns_type_get_all(session=Depends(router.db_func)):
+    #     query = select(DkDNSType).order_by(DkDNSType.id)
+    #     return await paginate(session, query)
+
+    # 0.05578250001417473
+    # 0.061614100000042527
+
+    @staticmethod
+    @router.get(path='', summary='获取元数据', response_model=Page[router.schema])
+    async def overloaded_dk_dns_type_get_all(session=Depends(router.db_func)):
+        query = select(DkDNSType).order_by(DkDNSType.id)
+        return await paginate(session, query)
 
 
 class DkDnsRouter:
@@ -37,16 +58,15 @@ class DkDnsRouter:
                         db=get_db,
                         tags=["数据源"], prefix='dataDns',
                         get_all_route=False, get_one_route=False)
+    LimitOffsetPage = LimitOffsetPage.with_custom_options(limit=Query(10, ge=1, le=100,
+                                                                      description="Page size limit"))
 
     @staticmethod
-    @router.get('', summary='获取全部数据源')
-    async def overloaded_dk_dns_get_all(pagination=router.pagination, session=Depends(router.db_func)):
-        limit, skip = pagination.get('limit'), pagination.get('skip')
+    @router.get('', summary='获取全部数据源', response_model=LimitOffsetPage[router.schema])
+    async def overloaded_dk_dns_get_all(session=Depends(router.db_func)):
         query = select(DkDnsInfo).options(
-            joinedload(DkDnsInfo.datasource_type_info, innerjoin=True)).order_by(DkDnsInfo.id).limit(
-            limit).offset(skip)
-        result = await session.execute(query)
-        return result.scalars().unique().all()
+            joinedload(DkDnsInfo.datasource_type_info, innerjoin=True)).order_by(DkDnsInfo.id)
+        return await paginate(session, query)
 
     @staticmethod
     @router.get('/{item_id}', summary='获取数据源详情')
@@ -92,8 +112,10 @@ class DkCatalogRouter:
 
     @staticmethod
     @router.get('', summary='获取全部目录')
-    async def overloaded_dk_catalog_get_all(session=Depends(router.db_func)):
-        query = select(DkCatalog).options(joinedload(DkCatalog.child_info, innerjoin=True)).order_by(DkCatalog.order_no)
+    async def overloaded_dk_catalog_get_all(pagination=router.pagination, session=Depends(router.db_func)):
+        limit, skip = pagination.get('limit'), pagination.get('skip')
+        query = select(DkCatalog).options(joinedload(DkCatalog.child_info, innerjoin=True)).order_by(
+            DkCatalog.order_no).limit(limit).offset(skip)
         result = await session.execute(query)
         return result.scalars().unique().all()
 
