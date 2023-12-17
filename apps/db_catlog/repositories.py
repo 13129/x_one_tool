@@ -44,7 +44,8 @@ class DkDnsSchema(BaseModelSchema):
 
 
 class DkTableSchema(BaseModelSchema):
-    datasource_id: DkDnsSchema
+    datasource_info: DkDnsSchema
+    datasource_id: str
     name: str
     physical_table_name: str
     logic_table_name: str
@@ -58,6 +59,8 @@ class DkTableSchema(BaseModelSchema):
     create_time: datetime
     last_modifier: str
     last_modify_time: datetime
+
+    # field_info: List[DkFieldSchema]
 
     class Config:
         from_attributes = True
@@ -108,6 +111,23 @@ class DkCatalogSchema(BaseModelSchema):
     last_modifier: str
     last_modify_time: datetime
     ctl_tb_relation_info: List[DkCatalogTableRelationalSchema]
+
+    class Config:
+        from_attributes = True
+
+
+class OutDkCatalogSchema(BaseModelSchema):
+    name_cn: str
+    name_en: str
+    catalog_code: str
+    parent_id: str
+    order_no: int
+    is_show: bool
+    creator: str
+    create_time: datetime
+    last_modifier: str
+    last_modify_time: datetime
+    child_info: List[OutDkCatalogSchema] = []  # noqa: F401
 
     class Config:
         from_attributes = True

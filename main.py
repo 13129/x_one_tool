@@ -39,12 +39,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-from fastapi_profiler import PyInstrumentProfilerMiddleware
 from apps.test import db_test_api
 
-app.add_middleware(
-    PyInstrumentProfilerMiddleware
-)
+# from fastapi_profiler import PyInstrumentProfilerMiddleware
+#
+#
+# app.add_middleware(
+#     PyInstrumentProfilerMiddleware
+# )
 
 app.include_router(db_c_api, prefix=settings.API_V1_STR)
 app.include_router(db_test_api, prefix=settings.API_V1_STR)

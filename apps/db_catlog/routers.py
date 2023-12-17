@@ -8,9 +8,8 @@ coding:utf-8
 from fastapi import Depends, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from fastapi_pagination import LimitOffsetPage, Page
+from fastapi_pagination import Page
 from fastapi_pagination.ext.async_sqlalchemy import paginate
-# from apps.common.pagination import Page
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
@@ -18,7 +17,7 @@ from apps.common import SQLAlchemyCRUDRouter as CRUDRouter
 from apps.db import get_db
 from apps.db_catlog.models import (DkDNSType, DkDnsInfo, DkCatalogTableRelational, DkCatalogTable, DkCatalog)
 from apps.db_catlog.repositories import (DkDnsTypeSchema, DkDnsSchema, DkCatalogTableRelationalSchema,
-                                         DkTableSchema, DkCatalogSchema)
+                                         DkTableSchema, DkCatalogSchema, OutDkCatalogSchema)
 from apps.db_catlog.schemas import DkDnsTypeSchemaCreate, DkTableSchemaCreate, DkDnsSchemaCreate
 
 
@@ -31,20 +30,10 @@ class DkDnsTypeRouter:
                         update_route=False, delete_all_route=False, delete_one_route=False, get_all_route=True,
                         tags=["元数据"], prefix='dataDnsTypes')
 
-    # LimitOffsetPage = LimitOffsetPage.with_custom_options(limit=Query(10, ge=1, le=100,
-    #                                                                   description="Page size limit"))
-
-    # @staticmethod
-    # @router.get('', summary='获取全部元数据', response_model=LimitOffsetPage[router.schema])
-    # async def overloaded_dk_dns_type_get_all(session=Depends(router.db_func)):
-    #     query = select(DkDNSType).order_by(DkDNSType.id)
-    #     return await paginate(session, query)
-
-    # 0.05578250001417473
-    # 0.061614100000042527
+    Page = Page.with_custom_options(size=Query(10, ge=1, le=100, description="Page size limit"))
 
     @staticmethod
-    @router.get(path='', summary='获取元数据', response_model=Page[router.schema])
+    @router.get('', summary='获取全部元数据', response_model=Page[router.schema])
     async def overloaded_dk_dns_type_get_all(session=Depends(router.db_func)):
         query = select(DkDNSType).order_by(DkDNSType.id)
         return await paginate(session, query)
@@ -58,11 +47,10 @@ class DkDnsRouter:
                         db=get_db,
                         tags=["数据源"], prefix='dataDns',
                         get_all_route=False, get_one_route=False)
-    LimitOffsetPage = LimitOffsetPage.with_custom_options(limit=Query(10, ge=1, le=100,
-                                                                      description="Page size limit"))
+    Page = Page.with_custom_options(size=Query(10, ge=1, le=100, description="Page size limit"))
 
     @staticmethod
-    @router.get('', summary='获取全部数据源', response_model=LimitOffsetPage[router.schema])
+    @router.get('', summary='获取全部数据源', response_model=Page[router.schema])
     async def overloaded_dk_dns_get_all(session=Depends(router.db_func)):
         query = select(DkDnsInfo).options(
             joinedload(DkDnsInfo.datasource_type_info, innerjoin=True)).order_by(DkDnsInfo.id)
@@ -84,15 +72,16 @@ class DkTableRouter:
     router = CRUDRouter(schema=DkTableSchema, create_schema=DkTableSchemaCreate, db_model=DkCatalogTable,
                         db=get_db,
                         get_all_route=False, tags=["表管理"], prefix='dataTables')
+    Page = Page.with_custom_options(size=Query(10, ge=1, le=100, description="Page size limit"))
 
     @staticmethod
-    @router.get('', summary='获取所有表列表')
-    async def overloaded_dk_table_get_all(pagination=router.pagination, session=Depends(router.db_func)):
-        limit, skip = pagination.get('limit'), pagination.get('skip')
+    @router.get('', summary='获取所有表列表', response_model=Page[router.schema])
+    async def overloaded_dk_table_get_all(session=Depends(router.db_func)):
+        # limit, skip = pagination.get('limit'), pagination.get('skip')
         query = select(DkCatalogTable).options(joinedload(DkCatalogTable.datasource_info, innerjoin=True)).order_by(
-            DkCatalogTable.id).limit(limit).offset(skip)
-        result = await session.execute(query)
-        return result.scalars().unique().all()
+            DkCatalogTable.id)
+        return await paginate(session, query)
+        # return result.scalars().unique().all()
 
     @staticmethod
     @router.get('/{item_id}', summary='获取表详情')
@@ -108,16 +97,16 @@ class DkCatalogRouter:
     """
     用于管理目录的增删改查
     """
-    router = CRUDRouter(schema=DkCatalogSchema, db_model=DkCatalog, db=get_db, tags=["目录管理"], prefix='dataCatalogs')
+    router = CRUDRouter(schema=DkCatalogSchema, db_model=DkCatalog, db=get_db, tags=["目录管理"], prefix='dataCatalogs',
+                        get_all_route=False)
+    Page = Page.with_custom_options(size=Query(10, ge=1, le=100, description="Page size limit"))
 
     @staticmethod
-    @router.get('', summary='获取全部目录')
-    async def overloaded_dk_catalog_get_all(pagination=router.pagination, session=Depends(router.db_func)):
-        limit, skip = pagination.get('limit'), pagination.get('skip')
+    @router.get('', summary='获取全部目录', response_model=Page[OutDkCatalogSchema])
+    async def overloaded_dk_catalog_get_all(session=Depends(router.db_func)):
         query = select(DkCatalog).options(joinedload(DkCatalog.child_info, innerjoin=True)).order_by(
-            DkCatalog.order_no).limit(limit).offset(skip)
-        result = await session.execute(query)
-        return result.scalars().unique().all()
+            DkCatalog.order_no)
+        return await paginate(session, query)
 
     @staticmethod
     @router.get('/{item_id}', summary='获取目录详情')
@@ -126,6 +115,15 @@ class DkCatalogRouter:
             DkCatalog.id == item_id).order_by(DkCatalog.order_no)
         result = await session.execute(query)
         return result.scalars().unique().all()
+
+
+class DkCatalogTableRelationalRouter:
+    """
+    用于管理目录关联表的增删改查
+    """
+    router = CRUDRouter(schema=DkCatalogTableRelationalSchema, db_model=DkCatalogTableRelational,
+                        db=get_db, get_all_route=False, get_one_route=False,
+                        tags=["目录关联管理"], prefix='catalogTableRelations')
 
     @staticmethod
     @router.api_route('/catalogTableRelationList/', methods=['GET'], summary='获取目录与表关联清单列表',
@@ -141,15 +139,6 @@ class DkCatalogRouter:
         result = jsonable_encoder(result.scalars().unique().all())
 
         return JSONResponse(status_code=200, content={"success": "ok", "code": 200, "data": result})
-
-
-class DkCatalogTableRelationalRouter:
-    """
-    用于管理目录关联表的增删改查
-    """
-    router = CRUDRouter(schema=DkCatalogTableRelationalSchema, db_model=DkCatalogTableRelational,
-                        db=get_db, get_all_route=False, get_one_route=False,
-                        tags=["目录关联管理"], prefix='catalogTableRelations')
 
 
 class DkDataQueryRouter:
