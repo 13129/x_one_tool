@@ -33,17 +33,17 @@ class DkDnsRouter(VControllerBase):
         summary='获取数据源',
         dependencies=[Depends(pagination_ctx(Page))],
         response_model=ResultJson[Page[response_schema]])
-    def ov_get_data_source_info_all(self):
-        result = self.dns_service.get_dns()
+    def ov_get_all(self):
+        result = self.dns_service.get_all()
         return ResultJson(data=result)
 
     @RestGet(
         path='/getDataSourceInfo/{dns_id}',
         summary="数据源详情",
         response_model=ResultJson[response_schema])
-    def ov_get_data_source_info(self, dns_id: str):
+    def ov_get_one(self, dns_id: str):
         try:
-            result = self.dns_service.get_dns_by_id(dns_id)
+            result = self.dns_service.get_one(dns_id)
         except NotFoundError as e:
             return ResultJson(code=e.status_code, data=None, message=e.detail)
         else:

@@ -20,8 +20,8 @@ class DnsService:
     def get_dns(self) -> list[Type[DkDataSourcesInfo]]:
         return self._repository.get_all()
 
-    def get_dns_by_id(self, dns_id: str) -> DkDataSourcesInfo:
-        return self._repository.get_by_id(dns_id)
+    def get_dns_by_id(self, _id: str) -> DkDataSourcesInfo:
+        return self._repository.get_by_id(_id)
 
-    def delete_dns_by_id(self, dns_id: str) -> Type[DkDataSourcesInfo]:
-        return self._repository.delete_by_id(dns_id)
+    def delete_dns_by_id(self, _id: str) -> Type[DkDataSourcesInfo]:
+        return self._repository.delete_by_id(_id)

@@ -6,30 +6,34 @@
 @Author    :XJC
 @Description:
 """
-from dependency_injector.wiring import Provide, inject
-from fastapi import Depends, Query
-from fastapi_pagination import Page, pagination_ctx
+
+from dependency_injector.wiring import Provide
+from fastapi import Depends
+from fastapi_pagination import pagination_ctx
 
 from src.common import RestGet, VControllerBase
-from src.core import ResultJson
-from src.schemas import DkTableSchema
 from src.containers import DkTableContainer
+from src.core import ResultJson
+from src.core.dependency import CustomPage
+from src.schemas import DkTableSchema
 
 
 class DkTableRouter(VControllerBase):
     prefix = "dkTableInfo"
     tags = ["数据表"]
-    Page = Page.with_custom_options(size=Query(10, ge=1, le=100, description="Page size limit"))
+
     response_schema = DkTableSchema
     table_service = Provide[DkTableContainer.service]
+    page = CustomPage
     logger = Provide[DkTableContainer.logger]
 
     @RestGet(
         path='/getTableList',
         summary='获取数据表',
-        dependencies=[Depends(pagination_ctx(Page))],
-        response_model=ResultJson[Page[response_schema]])
-    def ov_get_data_table_info_all(self):
-        result = self.table_service.get_table_all()
+        dependencies=[Depends(pagination_ctx(page))],
+        response_model=ResultJson[page[response_schema]])
+    def ov_get_all(self):
+        result = self.table_service.get_all()
         self.logger.info(result)
         return ResultJson(data=result)
+

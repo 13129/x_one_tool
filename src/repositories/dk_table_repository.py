@@ -26,8 +26,9 @@ class DkTableInfoRepository:
     def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]) -> None:
         self.session_factory = session_factory
 
-    def get_table_all(self):
+    def get_all(self):
         with self.session_factory() as session:
-            query = select(DkTableInfo).options(joinedload(DkTableInfo.fields, innerjoin=True))
+            query = select(DkTableInfo).options(joinedload(DkTableInfo.fields, innerjoin=True)).order_by(
+                DkTableInfo.last_modify_time)
             result = paginate(session, query)
             return result.model_dump()

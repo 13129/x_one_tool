@@ -7,7 +7,7 @@
 @Description:
 """
 from contextlib import AbstractContextManager
-from typing import Callable, Type
+from typing import Callable, Type, List
 
 from fastapi import status
 from fastapi_pagination.ext.sqlalchemy import paginate
@@ -26,9 +26,10 @@ class DkCatalogRepository:
     def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]) -> None:
         self.session_factory = session_factory
 
-    def get_all(self):
+    def get_all(self, name: str) -> List[DkCatalog]:
         with self.session_factory() as session:
-            query = select(DkCatalog).order_by(DkCatalog.id)
+            query = select(DkCatalog).options(joinedload(DkCatalog.child_info, innerjoin=False)).filter(
+                DkCatalog.name_cn.like(f'%{name}%')).order_by(DkCatalog.order_no)
             result = paginate(session, query)
             return result.model_dump()
 

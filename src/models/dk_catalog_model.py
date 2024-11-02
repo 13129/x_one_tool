@@ -24,6 +24,9 @@ class DkCatalog(DBBaseModel):
     last_modifier = Column("last_modifier", String(255), comment="上次修改用户")
     last_modify_time = Column("last_modify_time", DateTime, server_default=func.now(), onupdate=func.now(),
                               comment="上次修改时间")
+    child_info = relationship("DkCatalog",
+                              primaryjoin='DkCatalog.id==foreign(DkCatalog.parent_id)',
+                              backref=backref('dk_catalog', remote_side='DkCatalog.id'))
 
 
 class DkCatalogTableRelational(DBBaseModel):
@@ -37,3 +40,6 @@ class DkCatalogTableRelational(DBBaseModel):
     last_modifier = Column("last_modifier", String(255), comment="上次修改用户")
     last_modify_time = Column("last_modify_time", DateTime, server_default=func.now(), onupdate=func.now(),
                               comment="上次修改时间")
+    # catalog_info = relationship("DkCatalog",
+    #                             primaryjoin='foreign(dk_catalog_table_relational_info.c.catalog_code_id)==DkCatalog.id',
+    #                             backref=backref("ctl_tb_relation_info"))

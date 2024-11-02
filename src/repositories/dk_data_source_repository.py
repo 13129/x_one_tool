@@ -26,24 +26,24 @@ class DnsRepository:
 
     def get_all(self):
         with self.session_factory() as session:
-            query = select(DkDataSourcesInfo).order_by(DkDataSourcesInfo.id)
+            query = select(DkDataSourcesInfo).order_by(DkDataSourcesInfo.last_modify_time)
             result = paginate(session, query)
             return result.model_dump()
 
-    def get_by_id(self, dns_id: str) -> DkDataSourcesInfo:
+    def get_one(self, _id: str) -> DkDataSourcesInfo:
         with self.session_factory() as session:
-            query = select(DkDataSourcesInfo).where(DkDataSourcesInfo.id == dns_id)
+            query = select(DkDataSourcesInfo).where(DkDataSourcesInfo.id == _id)
             result = session.execute(query)
             result = result.scalar()
             if not result:
-                raise DnsNotFoundError(status.HTTP_404_NOT_FOUND, None, None, dns_id)
+                raise DnsNotFoundError(status.HTTP_404_NOT_FOUND, None, None, _id)
             return result
 
-    def delete_by_id(self, dns_id: str) -> Type[DkDataSourcesInfo]:
+    def delete_one(self, _id: str) -> Type[DkDataSourcesInfo]:
         with self.session_factory() as session:
-            result = session.get(DkDataSourcesInfo, dns_id)
+            result = session.get(DkDataSourcesInfo, _id)
             if not result:
-                raise DnsNotFoundError(status.HTTP_404_NOT_FOUND, None, None, dns_id)
+                raise DnsNotFoundError(status.HTTP_404_NOT_FOUND, None, None, _id)
             session.delete(result)
             session.commit()
             return result

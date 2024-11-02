@@ -10,6 +10,23 @@ import enum
 from datetime import datetime
 
 from src.core import BaseModelSchema
+from typing import Optional
+
+from pydantic import Field, BaseModel
+from pydantic.alias_generators import to_camel
+
+
+class DkDataSourcesTypeSchema(BaseModel):
+    id: Optional[str] = Field(title="主键")
+    type_name: str
+    is_async: Optional[int]
+    connect_string_default: Optional[str]
+    delete_status: int
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
 
 
 class DataSourceTypeEnum(str, enum.Enum):
@@ -37,7 +54,7 @@ class DkDataSourcesSchemaCreate(BaseModelSchema):
 
     class Config:
         from_attributes = True
-        # alias_generator = to_camel
+        alias_generator = to_camel
         populate_by_name = True
 
 
@@ -48,5 +65,5 @@ class DkDataSourcesSchema(DkDataSourcesSchemaCreate):
 
     class Config:
         from_attributes = True
-        # alias_generator = to_camel
+        alias_generator = to_camel
         populate_by_name = True
