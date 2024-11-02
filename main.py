@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
 from setting import settings
-from src.app import init_di
+from src import init_di
 from src.common.middleware.router_class import ContextIncludedRoute
 from xlogger import Loggers
 
@@ -24,7 +24,9 @@ app = FastAPI(
     log_level="info",
     docs_url=None,
     redoc_url=None,
-    reload=settings.RELOAD
+    reload=settings.RELOAD,
+    host=settings.HOST,
+    port=settings.PORT
 )
 app.add_middleware(
     CORSMiddleware,
@@ -98,5 +100,5 @@ if __name__ == '__main__':
                             log_level='debug')
     server = uvicorn.Server(config=config)
     Loggers.init_config()
-    
+
     server.run()
