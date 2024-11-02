@@ -8,9 +8,9 @@
 """
 from typing import Type
 
-from .models import DkDataSourcesInfo, DkTableInfo
-from .repositories import DkTableInfoRepository
-from .repositories import DnsRepository
+from .model import DkDataSourcesInfo, DkTableInfo
+from .repository import DkTableInfoRepository
+from .repository import DnsRepository
 
 
 class DnsService:
@@ -29,6 +29,7 @@ class DnsService:
 
 
 class DkTableInfoService:
+
     def __init__(self, repository: DkTableInfoRepository) -> None:
         self._repository: DkTableInfoRepository = repository
 

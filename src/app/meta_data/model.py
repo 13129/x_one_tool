@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-@FileName  :models.py
+@FileName  :model.py
 @Time      :2024/7/30 下午6:35
 @Author    :XJC
 @Description:

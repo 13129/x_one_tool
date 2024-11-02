@@ -6,15 +6,15 @@
 @Author    :XJC
 @Description:
 """
-from dependency_injector.wiring import Provide
+from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, Query
 from fastapi_pagination import Page, pagination_ctx
 
 from src.common import RestGet, VControllerBase
 from src.core import ResultJson
-from src.core.errors import NotFoundError
+from src.core.error import NotFoundError
 from src.schemas import DkDataSourcesSchema, DkTableSchema
-from .containers import MetaDataManagerContainer
+from .container import MetaDataManagerContainer
 
 
 class DkDnsRouter(VControllerBase):
@@ -58,6 +58,7 @@ class DkTableRouter(VControllerBase):
     table_service = Provide[MetaDataManagerContainer.table_service]
     logger = Provide[MetaDataManagerContainer.logger]
 
+
     @RestGet(
         path='/getTableList',
         summary='获取数据表',
@@ -65,6 +66,5 @@ class DkTableRouter(VControllerBase):
         response_model=ResultJson[Page[response_schema]])
     def ov_get_data_table_info_all(self):
         result = self.table_service.get_table_all()
-        print("=======================")
         self.logger.info(result)
         return ResultJson(data=result)

@@ -1,10 +1,8 @@
 import logging
 import os
 import sys
-import time
 from types import FrameType
 from typing import cast, List, Union, Any
-from setting import LogPath
 
 from loguru import logger
 
@@ -14,7 +12,6 @@ class Logger:
 
     def __init__(self, module_name: str = None, cls_logger=logger, parent_dir: str = None,
                  logs_dir: str = 'logs', level: int = 1):
-        # 文件的命名
         parent_dir: str = parent_dir if parent_dir else os.getcwd()
         self._LOGGING_DIR: str = os.path.join(parent_dir, logs_dir)
         if not os.path.isdir(self._LOGGING_DIR):
@@ -23,41 +20,6 @@ class Logger:
         self.levels: List[dict] = []
         self._logger = cls_logger
         self.module_name = module_name
-
-        # log_name = f"Fast_{time.strftime('%Y-%m-%d', time.localtime()).replace('-', '_')}.log"
-        # log_path = os.path.join(LogPath, "Fast_{time:YYYY-MM-DD}.log")
-        # self.logger = logger
-        # # 清空所有设置
-        # self.logger.remove()
-        # # 判断日志文件夹是否存在，不存则创建
-        # if not os.path.exists(LogPath):
-        #     os.makedirs(LogPath)
-        # 日志输出格式
-        # formatter = "{time:YYYY-MM-DD HH:mm:ss} | {level}: {message}"
-        # 添加控制台输出的格式,sys.stdout为输出到屏幕;关于这些配置还需要自定义请移步官网查看相关参数说明
-        # self.logger.add(sys.stdout,
-        #                 format="<green>{time:YYYYMMDD HH:mm:ss}</green> | "  # 颜色>时间
-        #                        "{process.name} | "  # 进程名
-        #                        "{thread.name} | "  # 进程名
-        #                        "<cyan>{module}</cyan>.<cyan>{function}</cyan>"  # 模块名.方法名
-        #                        ":<cyan>{line}</cyan> | "  # 行号
-        #                        "<level>{level}</level>: "  # 等级
-        #                        "<level>{message}</level>",  # 日志内容
-        #                 )
-        # self.logger.add(log_path,
-        #                 level='INFO',
-        #                 format='{time:YYYY-MM-DD HH:mm:ss} - '
-        #                        "{process.name} | "
-        #                        "{thread.name} | "
-        #                        '{module}.{function}:{line} - {level} -{message}',
-        #                 encoding='utf-8',
-        #                 retention=1,
-        #                 backtrace=True,
-        #                 diagnose=True,
-        #                 enqueue=True,
-        #                 rotation="100mb",
-        #                 compression="zip"
-        #                 )
 
     def add_level(self, name: str, color: str = "<white>", no: int = 0, log_filename: str = ''):
         """Add new logging level to loguru.logger config
@@ -158,20 +120,24 @@ class Logger:
     def logger(self):
         return self._logger
 
-    @staticmethod
-    def get_logger(module_name: str = 'default', level: int = 20, parent_dir: str = None,
+    @classmethod
+    def get_logger(cls, obj: Any, module_name: str = 'default', level: int = 20, parent_dir: str = None,
                    logs_dir: str = 'logs'):
-        return (
-            Logger(module_name=module_name, level=level, parent_dir=parent_dir,
-                   logs_dir=logs_dir).get_default().get_new_logger())
+        obj._logger = cls(module_name=module_name, level=level, parent_dir=parent_dir,
+                          logs_dir=logs_dir).get_default().get_new_logger()
+        return obj._logger
+
+    @property
+    def xlog(self):
+        return Logger.get_logger(self)
 
     @staticmethod
     def init_config():
-        LOGGER_NAMES = ("uvicorn.asgi", "uvicorn.access", "uvicorn")
-
+        logger_names = ("uvicorn.asgi", "uvicorn.access", "uvicorn")
         # change handler for default uvicorn logger
+
         logging.getLogger().handlers = [InterceptHandler()]
-        for logger_name in LOGGER_NAMES:
+        for logger_name in logger_names:
             logging_logger = logging.getLogger(logger_name)
             logging_logger.handlers = [InterceptHandler()]
 
@@ -196,4 +162,5 @@ class InterceptHandler(logging.Handler):
 
 
 Loggers = Logger()
-log = Loggers.get_logger(module_name='data_preprocess')
+
+log = Loggers.xlog

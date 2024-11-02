@@ -12,7 +12,7 @@ from typing import Optional, List
 from pydantic import BaseModel, Field
 from pydantic.alias_generators import to_camel
 
-from src.base import BaseModelSchema
+from src.core import BaseModelSchema
 
 
 class DataTableTypeEnum(str, enum.Enum):

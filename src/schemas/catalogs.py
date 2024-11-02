@@ -14,7 +14,7 @@ from typing import List
 from pydantic.alias_generators import to_camel
 from pydantic.fields import Field
 
-from src.base import BaseModelSchema
+from src.core import BaseModelSchema
 
 
 class DkCatalogTableRelSchemaDetail(BaseModelSchema):

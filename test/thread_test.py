@@ -57,10 +57,10 @@ async def scrape(executors, jid, loop):
 
 
 def current_time():
-    '''
+    """
     获取当前时间
     :return:
-    '''
+    """
     cur_time = datetime.datetime.now()
     return str(cur_time)
 

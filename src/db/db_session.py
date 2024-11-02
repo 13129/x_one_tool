@@ -6,7 +6,7 @@ coding:utf-8
 """
 from typing import Any
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, QueuePool
 from sqlalchemy.orm import sessionmaker
 
 from setting import settings
@@ -15,7 +15,10 @@ from setting import settings
 def _engine() -> Any:
     return create_engine(
         settings.sync_database_url,
-        echo=settings.DB_ECHO_LOG, logging_name=settings.DB_LOGGING_NAME, connect_args={"check_same_thread": False})
-
-
-SessionLocal = sessionmaker(bind=_engine(), expire_on_commit=False, future=True)
+        echo=settings.DB_ECHO_LOG,
+        logging_name=settings.DB_LOGGING_NAME,
+        poolclass=QueuePool,
+        pool_size=30,
+        pool_timeout=30,
+        pool_recycle=7200,
+    )

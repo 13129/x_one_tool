@@ -9,29 +9,23 @@ from fastapi.openapi.docs import (
 )
 from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
-from fastapi_pagination import add_pagination
 from starlette.middleware.cors import CORSMiddleware
 
-from apps.db_catlog import db_c_api as db_c_api
 from setting import settings
+from src.app import init_di
+from src.common.middleware.router_class import ContextIncludedRoute
+from xlogger import Loggers
 
 os.environ["TZ"] = settings.TIMEZONE
 app = FastAPI(
     title=settings.TITLE,
     description=settings.DESCRIPTION,
     debug=settings.DEBUG,
-    # log_level="info",
+    log_level="info",
     docs_url=None,
     redoc_url=None,
-    # openapi_url=None,
+    reload=settings.RELOAD
 )
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://127.0.0.1:8080",
-]
-add_pagination(app)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -39,28 +33,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-from apps.test import db_test_api
 
-# from fastapi_profiler import PyInstrumentProfilerMiddleware
-#
-#
-# app.add_middleware(
-#     PyInstrumentProfilerMiddleware
-# )
-
-app.include_router(db_c_api, prefix=settings.API_V1_STR)
-app.include_router(db_test_api, prefix=settings.API_V1_STR)
+init_di(app)
 app.mount('/static', StaticFiles(directory='static'), name='static')
-
-
-@app.on_event("startup")
-async def startup_event():
-    print("-----启动应用程序啦-----")
-    print("-----启动数据库可用性检查-----")
+app.router.route_class = ContextIncludedRoute
 
 
 @app.get('/')
-async def root():
+def root():
     return {"status": "ok"}
 
 
@@ -85,7 +65,7 @@ async def redoc_html():
     return get_redoc_html(
         openapi_url=app.openapi_url,
         title=app.title + " - ReDoc",
-        redoc_js_url="/static/swagger-ui/redoc.standalone.js",
+        redoc_js_url="static/swagger-ui/redoc.standalone.js",
     )
 
 
@@ -110,4 +90,13 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 if __name__ == '__main__':
-    uvicorn.run(app='main:app', reload=True, workers=1)
+    # uvicorn.run(host='0.0.0.0',port=18899, app='main:app', reload=True, workers=1, log_level="debug")
+    config = uvicorn.Config(app="main:app",
+                            port=18899,
+                            workers=4,
+                            reload=True,
+                            log_level='debug')
+    server = uvicorn.Server(config=config)
+    Loggers.init_config()
+    
+    server.run()

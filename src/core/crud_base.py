@@ -10,7 +10,7 @@ from typing import Any, Callable, Generic, List, Optional, Type, Union
 from fastapi import APIRouter, HTTPException
 from fastapi.types import DecoratedCallable
 
-from .types import T, DEPENDENCIES
+from .type import T, DEPENDENCIES
 
 NOT_FOUND = HTTPException(404, "Item not found")
 

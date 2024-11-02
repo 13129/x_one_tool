@@ -1,13 +1,12 @@
-from .route_common.crud_route.sqlalchemy_crud import SQLAlchemyCRUDRouter
-from .route_common.crud_route.virtual_crud import VirtualCRUDRouter
-from .route_common.virtual_controller import VirtualControllerBase
-from .route_common.virtual_route import VirtualAPIRouter
-from .route_common.rest_route import RestRouteGet, RestRoute
+from src.common.controller.controller import VControllerBase
+from src.common.controller.rest_method import rest_route_decorator
 
-__all__ = [
-    SQLAlchemyCRUDRouter,
-    VirtualControllerBase,
-    VirtualAPIRouter,
-    RestRouteGet,
-    RestRoute
-]
+RestGet = rest_route_decorator(methods_default=['GET'])
+RestPost = rest_route_decorator(methods_default=['POST'])
+RestDelete = rest_route_decorator(methods_default=['DELETE'])
+RestPut = rest_route_decorator(methods_default=['PUT'])
+RestHead = rest_route_decorator(methods_default=['HEAD'])
+RestConnect = rest_route_decorator(methods_default=['CONNECT'])
+RestOptions = rest_route_decorator(methods_default=['OPTIONS'])
+RestTrace = rest_route_decorator(methods_default=['TRACE'])
+RestPatch = rest_route_decorator(methods_default=['PATCH'])

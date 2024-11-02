@@ -12,10 +12,10 @@ from typing import Callable, Type
 from fastapi import status
 from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy import select
-from sqlalchemy.orm import Session, backref, joinedload, relationship
+from sqlalchemy.orm import Session, joinedload
 
-from .errors import DnsNotFoundError
-from .models import DkCatalog, DkDataSourcesInfo, DkTableInfo
+from .error import DnsNotFoundError
+from .model import DkCatalog, DkDataSourcesInfo, DkTableInfo
 
 
 class DnsTypeRepository:
@@ -99,6 +99,6 @@ class DkTableInfoRepository:
 
     def get_table_all(self):
         with self.session_factory() as session:
-            query = select(DkTableInfo).options(joinedload(DkTableInfo.fields,innerjoin=True))
+            query = select(DkTableInfo).options(joinedload(DkTableInfo.fields, innerjoin=True))
             result = paginate(session, query)
             return result.model_dump()

@@ -9,7 +9,7 @@ from __future__ import annotations
 import enum
 from datetime import datetime
 
-from src.base import BaseModelSchema
+from src.core import BaseModelSchema
 
 
 class DataSourceTypeEnum(str, enum.Enum):

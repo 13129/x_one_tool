@@ -6,3 +6,13 @@
 @Author    :XJC
 @Description:
 """
+from dependency_injector import providers
+
+from .meta_data.container import MetaDataManagerContainer
+from src.core.container import BaseContainer
+
+
+class Application(BaseContainer):
+    MetaDataManagerModule = providers.Container(
+        MetaDataManagerContainer,
+    )

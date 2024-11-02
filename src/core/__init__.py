@@ -8,6 +8,6 @@
 """
 
 from .crud_base import CRUDGenerator
-from .models import DBBaseModel
-from .types import PYDANTIC_SCHEMA
+from .model import DBBaseModel
+from .type import PYDANTIC_SCHEMA
 from .schema import BaseModelSchema, RouteArgsBase, ResultJson

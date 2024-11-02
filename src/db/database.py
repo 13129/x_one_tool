@@ -7,11 +7,10 @@ coding:utf-8
 
 # Import all the models, so that Base has them before being imported by Alembic
 
-from src.base import DBBaseModel  # noqa: F401
-from src.db_catlog.models import DkDnsInfo  # noqa: F401
-from src.db_catlog.models import DkCatalogTable  # noqa: F401
-from src.db_catlog.models import DkCatalogField  # noqa: F401
-from src.db_catlog.models import DkCatalog  # noqa: F401
-from src.db_catlog.models import DkDNSType  # noqa: F401
-from src.db_catlog.models import DkCatalogTableRelational  # noqa: F401
-from src.test.models import DbTestModel  # noqa: F401
+from src.core import DBBaseModel  # noqa: F401
+from src.model import DkDataSourcesInfo  # noqa: F401
+from src.model import DkTableInfo  # noqa: F401
+from src.model import DkTableFieldInfo  # noqa: F401
+from src.model import DkCatalog  # noqa: F401
+from src.model import DkDataSourcesType  # noqa: F401
+from src.model import DkCatalogTableRelational  # noqa: F401

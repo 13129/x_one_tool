@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-@FileName  :containers.py
+@FileName  :container.py
 @Time      :2024/7/30 下午6:37
 @Author    :XJC
 @Description:
 """
 from dependency_injector import containers, providers
 
-from src.core.containers import BaseContainer
-from .repositories import DkTableInfoRepository, DnsRepository
-from .services import DkTableInfoService, DnsService
+from src.core.container import BaseContainer
+from .repository import DkTableInfoRepository, DnsRepository
+from .service import DkTableInfoService, DnsService
 
 
 class MetaDataManagerContainer(BaseContainer):
-    wiring_config = containers.WiringConfiguration(modules=[".routers"])
+    wiring_config = containers.WiringConfiguration(modules=[".router"])
     dns_repository = providers.Factory(
         DnsRepository,
         session_factory=BaseContainer.db.provided.session,

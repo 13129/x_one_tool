@@ -11,8 +11,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseConfig
-from pydantic import FilePath
+from pydantic import ConfigDict
 
 logger = logging.getLogger(__name__)
 
@@ -24,22 +23,31 @@ class EnvironmentEnum(str, Enum):
     LOCAL = "local"
 
 
-class GlobalConfig(BaseConfig):
+class GlobalConfig(ConfigDict):
     TITLE: str = "DBTool"
     DESCRIPTION: str = "DB工具"
 
     ENVIRONMENT: EnvironmentEnum
-    DEBUG: bool = False
+    DEBUG: bool = True
+    RELOAD: bool = True
     TESTING: bool = False
     TIMEZONE: str = "UTC"
+    LOG_LEVEL: int = 1
+    MODULE_NAME: str = 'x_one_tool'
 
-    DATABASE_URL: Optional[FilePath] = os.path.join(BASE_DIR, "db.sqlite3")
+    # DATABASE_URL: Optional[FilePath] = os.path.join(BASE_DIR, "db.sqlite3")
+    DATABASE_URL: Optional[str] = None
+
     DB_ECHO_LOG: bool = False
     DB_LOGGING_NAME: str = 'DBTool'
+    LogPath = 'logs'
 
     @property
-    def async_database_url(self) -> Optional[str]:
-        self.DATABASE_URL = "sqlite+aiosqlite:///{}/db.sqlite3".format(BASE_DIR)
+    def sync_database_url(self) -> Optional[str]:
+        # self.DATABASE_URL = "postgresql+psycopg2://zhsq:zhsq@192.168.30.66/x_one_tool"
+        # self.SYNC_DATABASE_URL = "postgresql://postgres:8693585@192.168.3.101/data_preprocess"
+        # return self.DATABASE_URL if self.DATABASE_URL else self.DATABASE_URL
+        self.DATABASE_URL = "sqlite:///{}/db.sqlite3".format(BASE_DIR)
         return self.DATABASE_URL if self.DATABASE_URL else self.DATABASE_URL
 
     # Api V1 prefix

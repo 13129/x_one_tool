@@ -1,7 +1,7 @@
 from typing import Any, Callable, List, Type, Generator, Optional, Union
 
-from src.base.crud_base import CRUDGenerator
-from src.base.types import PYDANTIC_SCHEMA as SCHEMA
+from src.core.crud_base import CRUDGenerator
+from src.core.type import PYDANTIC_SCHEMA as SCHEMA
 
 try:
     from sqlalchemy.orm import Session

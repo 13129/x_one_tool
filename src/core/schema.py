@@ -6,7 +6,7 @@ from fastapi.datastructures import DefaultPlaceholder, Default
 from fastapi.openapi.models import Response
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 T = TypeVar('T')  # 泛型类型 T
 

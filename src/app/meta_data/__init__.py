@@ -8,8 +8,8 @@
 """
 from fastapi import APIRouter
 
-from src.app.dns.routers import DkDnsRouter, DkTableRouter
+from .router import DkDnsRouter, DkTableRouter
 
 dns_api = APIRouter()
-dns_api.include_router(DkDnsRouter.instance(), prefix="/dataSources")
-dns_api.include_router(DkTableRouter.instance(), prefix="/dataSources")
+dns_api.include_router(DkDnsRouter.instance(), prefix="/metaData")
+dns_api.include_router(DkTableRouter.instance(), prefix="/metaData")

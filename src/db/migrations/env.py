@@ -1,15 +1,15 @@
+import asyncio
 import sys
 from logging.config import fileConfig
 
-import asyncio
 from alembic import context
-from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy import create_engine
 
 sys.path = ["", ".."] + sys.path[1:]  # TODO: Fix it
 
 from setting import settings  # noqa
-from src.base.db.database import DBBaseModel  # noqa
+from src.db.database import DBBaseModel  # noqa
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)

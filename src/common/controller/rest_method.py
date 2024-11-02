@@ -7,12 +7,13 @@ from fastapi.openapi.models import Response
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 
-from src.base.schema import RouteArgsBase
+from src.core.schema import RouteArgsBase
+from dependency_injector.wiring import inject
 
 
-def rest_route_decorator(methods_default: List[str], name_default: str):
+def rest_route_decorator(methods_default: Optional[Union[Set[str], List[str]]]):
     def decorator(path: str,
-                  methods: Optional[List[str]] = None,
+                  methods=None,
                   response_model: Optional[Type[Any]] = None,
                   status_code: Optional[int] = None,
                   tags: Optional[List[Union[str, Enum]]] = None,
@@ -35,6 +36,9 @@ def rest_route_decorator(methods_default: List[str], name_default: str):
                   callbacks: Optional[List[APIRoute]] = None,
                   openapi_extra: Optional[Dict[str, Any]] = None,
                   **kwargs: Any):
+        if methods is None:
+            methods = methods_default
+
         def call_func(fun: Callable) -> Callable[[Callable], Callable]:
             route_args = RouteArgsBase(path=path,
                                        name=name,
