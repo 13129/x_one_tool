@@ -4,3 +4,4 @@ upload/
 logs/
 *.pyc
 __pycache__/
+.vscode/

@@ -9,7 +9,7 @@
 from dependency_injector.wiring import Provide
 from fastapi import Depends
 from fastapi_pagination import pagination_ctx
-from typing import Optional
+from typing import Any, Optional
 from src.common import RestGet, VControllerBase
 from src.containers import DkCatalogContainer
 from src.core import ResultJson
@@ -31,7 +31,7 @@ class DkCatalogRouter(VControllerBase):
         summary='获取数据目录',
         dependencies=[Depends(pagination_ctx(page))],
         response_model=ResultJson[page[response_schema]])
-    def ov_get_all(self, name: Optional[str] = ''):
+    def ov_get_all(self, name: Optional[str] = '') -> ResultJson[Any]:
         result = self.catalog_service.get_all(name=name)
         self.logger.info(result)
         return ResultJson(data=result)
