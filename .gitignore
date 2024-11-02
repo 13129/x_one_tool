@@ -1,0 +1,6 @@
+.idea/
+test/
+upload/
+logs/
+*.pyc
+__pycache__/
