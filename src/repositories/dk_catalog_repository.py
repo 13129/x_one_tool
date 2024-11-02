@@ -26,27 +26,27 @@ class DkCatalogRepository:
     def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]) -> None:
         self.session_factory = session_factory
 
-    def get_all(self, name: str) -> List[DkCatalog]:
+    def get_all(self, name) -> List[DkCatalog]:
         with self.session_factory() as session:
             query = select(DkCatalog).options(joinedload(DkCatalog.child_info, innerjoin=False)).filter(
                 DkCatalog.name_cn.like(f'%{name}%')).order_by(DkCatalog.order_no)
             result = paginate(session, query)
             return result.model_dump()
 
-    def get_by_id(self, catalog_id: str) -> DkCatalog:
+    def get_by_id(self, _id: str) -> DkCatalog:
         with self.session_factory() as session:
-            query = select(DkCatalog).where(DkCatalog.id == catalog_id)
+            query = select(DkCatalog).where(DkCatalog.id == _id)
             result = session.execute(query)
             result = result.scalar()
             if not result:
-                raise DnsNotFoundError(status.HTTP_404_NOT_FOUND, None, None, catalog_id)
+                raise DnsNotFoundError(status.HTTP_404_NOT_FOUND, None, None, _id)
             return result
 
-    def delete_by_id(self, catalog_id: str) -> Type[DkCatalog]:
+    def delete_by_id(self, _id: str) -> Type[DkCatalog]:
         with self.session_factory() as session:
-            result = session.get(DkCatalog, catalog_id)
+            result = session.get(DkCatalog, _id)
             if not result:
-                raise DnsNotFoundError(status.HTTP_404_NOT_FOUND, None, None, catalog_id)
+                raise DnsNotFoundError(status.HTTP_404_NOT_FOUND, None, None, _id)
             session.delete(result)
             session.commit()
             return result

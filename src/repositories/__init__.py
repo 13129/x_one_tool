@@ -1,3 +1,3 @@
-from .dk_table import DkTableInfoRepository
-from .dk_data_source import DnsTypeRepository,DnsRepository
-from .dk_catalog import DkCatalogRepository
+from .dk_table_repository import DkTableInfoRepository
+from .dk_data_source_repository import DnsTypeRepository,DnsRepository
+from .dk_catalog_repository import DkCatalogRepository

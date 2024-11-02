@@ -16,3 +16,4 @@ def create_query_validation_exception(field: str, msg: str) -> HTTPException:
             ]
         },
     )
+

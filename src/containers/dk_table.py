@@ -15,7 +15,7 @@ from src.services import DkTableInfoService
 
 
 class DkTableContainer(BaseContainer):
-    wiring_config = containers.WiringConfiguration(modules=["src.api.v1.dk_table"])
+    wiring_config = containers.WiringConfiguration(modules=["src.api.v1"])
 
     repository = providers.Factory(
         DkTableInfoRepository,

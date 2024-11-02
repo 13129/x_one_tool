@@ -1,6 +1,6 @@
 from dependency_injector import providers
 
-from src.containers import DkDnsContainer, DkTableContainer
+from src.containers import DkDnsContainer, DkTableContainer, DkCatalogContainer
 from src.core.container import BaseContainer
 
 
@@ -10,4 +10,7 @@ class Application(BaseContainer):
     )
     DkTableModule = providers.Container(
         DkTableContainer
+    )
+    DkCatalogModule = providers.Container(
+        DkCatalogContainer
     )

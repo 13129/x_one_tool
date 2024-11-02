@@ -15,11 +15,11 @@ from .crud import VCRUDRouterBase
 
 
 class VControllerBase(metaclass=abc.ABCMeta):
-    __slots__ = ["api_router", "tags", "prefix", "session", "Page", "response_schema", "schema"]
+    __slots__ = ["api_router", "tags", "prefix", "session", "page", "response_schema", "schema"]
     prefix: Optional[str]
     tags: Optional[List[str]]
     session: Optional[Session]
-    Page: Optional[Any]
+    page: Optional[Any]
     response_schema: Optional[Any]
     schema: Optional[Any]
 

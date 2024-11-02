@@ -17,7 +17,7 @@ from src.core.dependency import CustomPage
 from src.schemas import DkCatalogRelSchemaDetail
 
 
-class TestRouter(VControllerBase):
+class DkCatalogRouter(VControllerBase):
     prefix = "dkCatalog"
     tags = ["数据目录"]
 

@@ -1,3 +1,3 @@
-from .dk_catalog import *
-from .dk_data_source import DnsService
-from .dk_table import DkTableInfoService
+from .dk_catalog_service import DkCatalogService
+from .dk_data_source_service import DnsService
+from .dk_table_service import DkTableInfoService
