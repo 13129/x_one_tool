@@ -17,11 +17,11 @@ class DnsService:
     def __init__(self, repository: DnsRepository) -> None:
         self._repository: DnsRepository = repository
 
-    async def get_dns(self) -> list[Type[DkDataSourcesInfo]]:
+    async def get_all(self) -> list[Type[DkDataSourcesInfo]]:
         return await self._repository.get_all()
 
-    async def get_dns_by_id(self, _id: str) -> DkDataSourcesInfo:
-        return await self._repository.get_by_id(_id)
+    async def get_one(self, _id: str) -> DkDataSourcesInfo:
+        return await self._repository.get_one(_id)
 
-    async def delete_dns_by_id(self, _id: str) -> Type[DkDataSourcesInfo]:
-        return await self._repository.delete_by_id(_id)
+    async def delete_one(self, _id: str) -> Type[DkDataSourcesInfo]:
+        return await self._repository.delete_one(_id)

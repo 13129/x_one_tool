@@ -33,5 +33,4 @@ class DkCatalogRouter(VControllerBase):
         response_model=ResultJson[page[response_schema]])
     async def ov_get_all(self, name: Optional[str] = '') -> ResultJson[Any]:
         result = await self.catalog_service.get_all(name=name)
-        self.logger.info(result)
         return ResultJson(data=result)

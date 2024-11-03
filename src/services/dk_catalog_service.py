@@ -21,8 +21,8 @@ class DkCatalogService:
     async def get_all(self, name) -> list[DkCatalog]:
         return await self._repository.get_all(name)
 
-    async def get_by_id(self, _id: str) -> DkCatalog:
-        return await self._repository.get_by_id(_id)
+    async def get_one(self, _id: str) -> DkCatalog:
+        return await self._repository.get_one(_id)
 
-    async def delete_by_id(self, _id: str) -> Type[DkCatalog]:
-        return await self._repository.delete_by_id(_id)
+    async def delete_one(self, _id: str) -> Type[DkCatalog]:
+        return await self._repository.delete_one(_id)
