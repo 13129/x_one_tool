@@ -17,7 +17,7 @@ class DkCatalogContainer(BaseContainer):
     wiring_config = containers.WiringConfiguration(modules=["src.api.v1"])
     repository = providers.Factory(
         DkCatalogRepository,
-        session_factory=BaseContainer.db.provided.session,
+        session_factory=BaseContainer.db.provided.dk_async_session,
     )
     service = providers.Factory(
         DkCatalogService,

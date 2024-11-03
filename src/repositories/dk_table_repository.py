@@ -6,16 +6,15 @@
 @Author    :XJC
 @Description:
 """
-from contextlib import AbstractContextManager
-from typing import Callable, Type
+from contextlib import AbstractAsyncContextManager
+from typing import Callable
 
-from fastapi import status
 from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy import select
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
-from src.errors import DnsNotFoundError
-from src.models import DkTableInfo, DkTableFieldInfo
+from src.models import DkTableInfo
 
 
 class DkTableInfoRepository:
@@ -23,12 +22,12 @@ class DkTableInfoRepository:
     表管理crud
     """
 
-    def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]) -> None:
+    def __init__(self, session_factory: Callable[..., AbstractAsyncContextManager[AsyncSession]]) -> None:
         self.session_factory = session_factory
 
-    def get_all(self):
-        with self.session_factory() as session:
+    async def get_all(self):
+        async with self.session_factory() as session:
             query = select(DkTableInfo).options(joinedload(DkTableInfo.fields, innerjoin=True)).order_by(
                 DkTableInfo.last_modify_time)
-            result = paginate(session, query)
+            result = await paginate(session, query)
             return result.model_dump()

@@ -41,9 +41,9 @@ class DkDnsRouter(VControllerBase):
         path='/getDataSourceInfo/{dns_id}',
         summary="数据源详情",
         response_model=ResultJson[response_schema])
-    def ov_get_one(self, dns_id: str):
+    async def ov_get_one(self, dns_id: str):
         try:
-            result = self.dns_service.get_one(dns_id)
+            result = await self.dns_service.get_one(dns_id)
         except NotFoundError as e:
             return ResultJson(code=e.status_code, data=None, message=e.detail)
         else:

@@ -19,7 +19,7 @@ class DkTableContainer(BaseContainer):
 
     repository = providers.Factory(
         DkTableInfoRepository,
-        session_factory=BaseContainer.db.provided.session,
+        session_factory=BaseContainer.db.provided.dk_async_session,
     )
     service = providers.Factory(
         DkTableInfoService,

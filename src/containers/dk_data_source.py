@@ -9,7 +9,7 @@ class DkDnsContainer(BaseContainer):
     wiring_config = containers.WiringConfiguration(modules=["src.api.v1"])
     repository = providers.Factory(
         DnsRepository,
-        session_factory=BaseContainer.db.provided.session,
+        session_factory=BaseContainer.db.provided.dk_async_session,
     )
     service = providers.Factory(
         DnsService,

@@ -18,11 +18,11 @@ class DkCatalogService:
     def __init__(self, repository: DkCatalogRepository) -> None:
         self._repository: DkCatalogRepository = repository
 
-    def get_all(self, name) -> list[DkCatalog]:
-        return self._repository.get_all(name)
+    async def get_all(self, name) -> list[DkCatalog]:
+        return await self._repository.get_all(name)
 
-    def get_by_id(self, _id: str) -> DkCatalog:
-        return self._repository.get_by_id(_id)
+    async def get_by_id(self, _id: str) -> DkCatalog:
+        return await self._repository.get_by_id(_id)
 
-    def delete_by_id(self, _id: str) -> Type[DkCatalog]:
-        return self._repository.delete_by_id(_id)
+    async def delete_by_id(self, _id: str) -> Type[DkCatalog]:
+        return await self._repository.delete_by_id(_id)

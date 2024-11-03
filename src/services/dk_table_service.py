@@ -17,5 +17,5 @@ class DkTableInfoService:
     def __init__(self, repository: DkTableInfoRepository) -> None:
         self._repository: DkTableInfoRepository = repository
 
-    def get_table_all(self) -> list[Type[DkTableInfo]]:
-        return self._repository.get_table_all()
+    async def get_all(self) -> list[Type[DkTableInfo]]:
+        return await self._repository.get_all()

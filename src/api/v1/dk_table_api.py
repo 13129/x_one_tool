@@ -32,8 +32,7 @@ class DkTableRouter(VControllerBase):
         summary='获取数据表',
         dependencies=[Depends(pagination_ctx(page))],
         response_model=ResultJson[page[response_schema]])
-    def ov_get_all(self):
-        result = self.table_service.get_all()
-        self.logger.info(result)
+    async def ov_get_all(self):
+        result = await self.table_service.get_all()
         return ResultJson(data=result)
 

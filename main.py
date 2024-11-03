@@ -95,7 +95,7 @@ if __name__ == '__main__':
     # uvicorn.run(host='0.0.0.0',port=18899, app='main:app', reload=True, workers=1, log_level="debug")
     config = uvicorn.Config(app="main:app",
                             port=18899,
-                            workers=4,
+                            workers=1,
                             reload=True,
                             log_level='debug')
     server = uvicorn.Server(config=config)
