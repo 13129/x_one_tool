@@ -24,9 +24,9 @@ app = FastAPI(
     log_level="info",
     docs_url=None,
     redoc_url=None,
-    reload=settings.RELOAD,
-    host=settings.HOST,
-    port=settings.PORT
+    # reload=settings.RELOAD,
+    # host=settings.HOST,
+    # port=settings.PORT
 )
 app.add_middleware(
     CORSMiddleware,
@@ -92,13 +92,13 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 if __name__ == '__main__':
-    # uvicorn.run(host='0.0.0.0',port=18899, app='main:app', reload=True, workers=1, log_level="debug")
-    config = uvicorn.Config(app="main:app",
-                            port=18899,
-                            workers=1,
-                            reload=True,
-                            log_level='debug')
-    server = uvicorn.Server(config=config)
+    uvicorn.run(host='127.0.0.1',port=18899, app='main:app', reload=True, workers=1, log_level="debug")
+    # config = uvicorn.Config(app="main:app",
+    #                         port=18899,
+    #                         workers=1,
+    #                         reload=True,
+    #                         log_level='debug')
+    # server = uvicorn.Server(config=config)
     Loggers.init_config()
 
-    server.run()
+    # server.run()
