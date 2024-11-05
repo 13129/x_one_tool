@@ -6,7 +6,6 @@
 @Author    :XJC
 @Description:
 """
-from src.schemas.data_sources import DkDataSourcesSchema, DkDataSourcesSchemaCreate
-from src.schemas.data_sources_type import DkDataSourcesTypeSchema
-from src.schemas.data_table import (DkTableSchema, DkFieldInfoSchema)
-# DkTableFieldDetailSchemaCreate, \DkFieldInfoSchemaCreate)
+from .data_source_schema import DkDataSourcesSchema, DkDataSourcesSchemaCreate,DkDataSourcesTypeSchema
+from .data_table_schema import (DkTableSchema, DkFieldInfoSchema)
+from .dk_catalog_schema import DkCatalogRelSchemaDetail
