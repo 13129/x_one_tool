@@ -6,12 +6,11 @@
 @Author    :XJC
 @Description:
 """
-import asyncio
 import logging
-from contextlib import asynccontextmanager,AbstractAsyncContextManager
+from contextlib import contextmanager, AbstractContextManager
 from typing import Callable
 
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker, async_scoped_session
+from sqlalchemy import create_engine, orm
 from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
@@ -20,25 +19,23 @@ logger = logging.getLogger(__name__)
 class Database:
 
     def __init__(self, db_url: str) -> None:
-        self.async_engine = create_async_engine(db_url, echo=False)
-        self.async_factory = async_scoped_session(
-            async_sessionmaker(
+        self._engine = create_engine(db_url, echo=False)
+        self._session_factory = orm.scoped_session(
+            orm.sessionmaker(
                 autocommit=False,
                 autoflush=False,
-                bind=self.async_engine,
-                class_=AsyncSession
+                bind=self._engine,
             ),
-            scopefunc=asyncio.current_task,
         )
 
-    @asynccontextmanager
-    async def dk_async_session(self) -> Callable[..., AbstractAsyncContextManager[Session]]:
-        session = self.async_factory()
+    @contextmanager
+    def session(self) -> Callable[..., AbstractContextManager[Session]]:
+        session: Session = self._session_factory()
         try:
             yield session
         except Exception:
             logger.exception("Session rollback because of exception")
-            await session.rollback()
+            session.rollback()
             raise
         finally:
-            await session.close()
+            session.close()
