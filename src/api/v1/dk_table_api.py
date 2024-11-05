@@ -7,6 +7,7 @@
 @Description:
 """
 
+from typing import Any
 from dependency_injector.wiring import Provide
 from fastapi import Depends
 from fastapi_pagination import pagination_ctx
@@ -21,18 +22,18 @@ from src.schemas import DkTableSchema
 class DkTableRouter(VControllerBase):
     prefix = "dkTableInfo"
     tags = ["数据表"]
-
-    response_schema = DkTableSchema
-    table_service = Provide[DkTableContainer.service]
     page = CustomPage
+    response_schema = DkTableSchema
+
+    tableService = Provide[DkTableContainer.service]
     logger = Provide[DkTableContainer.logger]
 
     @RestGet(
         path='/getTableList',
         summary='获取数据表',
-        dependencies=[Depends(pagination_ctx(page))],
+        dependencies=[Depends(pagination_ctx(page=page))],
         response_model=ResultJson[page[response_schema]])
-    async def ov_get_all(self):
-        result = await self.table_service.get_all()
+    async def ov_get_all(self) -> ResultJson[Any]:
+        result = await self.tableService.get_all()
         return ResultJson(data=result)
 
