@@ -18,9 +18,6 @@ app = FastAPI(
     docs_url=None,
     redoc_url=None,
     lifespan=lifespan
-    # reload=settings.RELOAD,
-    # host=settings.HOST,
-    # port=settings.PORT
 )
 app.add_middleware(
     CORSMiddleware,
@@ -34,7 +31,6 @@ init_di(app)
 app.mount('/static', StaticFiles(directory='static'), name='static')
 app.router.route_class = ContextIncludedRoute
 app.openapi = custom_static_openapi(app)
-
 
 @app.get('/')
 def root():
