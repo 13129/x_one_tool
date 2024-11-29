@@ -1,18 +1,76 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-@FileName  :data_tables.py
-@Time      :2024/2/4 9:42
+@FileName  :dk_data.py
+@Time      :2024/11/29 14:31
 @Author    :XJC
 @Description:
 """
+
+from __future__ import annotations
+
 import enum
 from datetime import datetime
-from typing import Optional, List
-from pydantic import BaseModel, Field
+from typing import List, Optional
+
+from pydantic import BaseModel
 from pydantic.alias_generators import to_camel
+from pydantic.fields import Field
 
 from src.core import BaseModelSchema
+
+
+class DkDataSourcesTypeSchema(BaseModel):
+    id: Optional[str] = Field(title="主键")
+    type_name: str
+    is_async: Optional[int]
+    connect_string_default: Optional[str]
+    delete_status: int
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class DataSourceTypeEnum(str, enum.Enum):
+    PostgreSQL = "PostgreSQL"
+    MySQL = "MySQL"
+    Oracle = "Oracle"
+    Kafka = "Kafka"
+    Ftp = "FTP"
+    SFtp = "SFTP"
+
+
+class DkDataSourcesSchemaCreate(BaseModelSchema):
+    datasource_type_id: DataSourceTypeEnum = DataSourceTypeEnum.PostgreSQL
+    datasource_name: str
+    host: str
+    user_name: str
+    password: str
+    connect_string: str
+    driver_name: str
+    default_db: str
+    driver_file_path: str
+    port: int
+    creator: str
+    last_modifier: str
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class DkDataSourcesSchema(DkDataSourcesSchemaCreate):
+    id: str
+    create_time: datetime
+    last_modify_time: datetime
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
 
 
 class DataTableTypeEnum(str, enum.Enum):
@@ -70,6 +128,8 @@ class DkTableSchema(BaseModelSchema):
         from_attributes = True
         # alias_generator = to_camel
         populate_by_name = True
+
+
 #
 #
 # class DkTableFieldDetailSchema(DkTableFieldDetailSchemaCreate):
@@ -94,3 +154,21 @@ class DkTableSchema(BaseModelSchema):
 #         from_attributes = True
 #         alias_generator = to_camel
 #         populate_by_name = True
+
+
+class DkCatalogRelSchemaDetail(BaseModelSchema):
+    name_cn: Optional[str]
+    name_en: Optional[str]
+    catalog_code: Optional[str]
+    order_no: int
+    is_show: bool
+    creator: str
+    create_time: datetime
+    last_modifier: str
+    last_modify_time: datetime
+    child_info: Optional[List[DkCatalogRelSchemaDetail]]
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True

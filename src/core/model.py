@@ -7,8 +7,9 @@ coding:utf-8
 
 import uuid
 
-from sqlalchemy import Column, String
+from sqlalchemy import String
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 def uuid_hex():
@@ -17,7 +18,7 @@ def uuid_hex():
 
 @as_declarative()
 class DBBaseModel:
-    id = Column(String(64), primary_key=True, default=uuid_hex)
+    id:Mapped[str] = mapped_column(String(64), primary_key=True, default=uuid_hex)
 
     @declared_attr
     def __tablename__(self) -> str:
