@@ -6,3 +6,8 @@
 @Author    :XJC
 @Description:
 """
+from src.core.error import NotFoundError
+
+
+class DnsNotFoundError(NotFoundError):
+    entity_name: str = "数据源"

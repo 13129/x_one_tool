@@ -14,8 +14,6 @@ from fastapi.openapi.utils import get_openapi
 
 from setting import settings
 from src.api import dk_api
-from src.containers import DkDnsContainer, DkTableContainer
-from src.core.container import BaseContainer
 from xlogger import Loggers
 from .module import Application
 

@@ -1,6 +1,6 @@
 from dependency_injector import providers
 
-from src.containers import DkDnsContainer, DkTableContainer, DkCatalogContainer
+from src.containers.dk_data import DkDnsContainer, DkTableContainer, DkCatalogContainer
 from src.core.container import BaseContainer
 
 
