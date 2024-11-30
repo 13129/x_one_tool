@@ -7,11 +7,13 @@
 @Description:
 """
 
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 from dependency_injector.wiring import Provide
 from fastapi import Depends
+from fastapi.encoders import jsonable_encoder
 from fastapi_pagination import pagination_ctx
+from fastapi_users.schemas import model_dump
 
 from src.common import RestGet, VControllerBase
 from src.containers.dk_data import DkCatalogContainer,DkTableContainer,DkDnsContainer
@@ -85,8 +87,15 @@ class DkCatalogRouter(VControllerBase):
     @RestGet(
         path='/getDkCatalogAll',
         summary='获取数据目录',
-        dependencies=[Depends(pagination_ctx(page))],
-        response_model=ResultJson[page[response_schema]])
-    async def ov_get_all(self, name: Optional[str] = '') -> ResultJson[Any]:
-        result = await self.catalog_service.get_all(name=name)
-        return ResultJson(data=result)
+        response_model=ResultJson[List[response_schema]]
+    )
+    async def ov_get_all(self) -> ResultJson[Any]:
+        result = await self.catalog_service.get_all()
+        # 转换为 Pydantic 模型
+        def build_tree(data, parent_id=''):
+            nodes = [item for item in data if item.parent_id == parent_id ]
+            for node in nodes:
+                node.child_info = build_tree(data, parent_id=node.id)
+            return nodes
+        root_nodes = build_tree(result, parent_id='')
+        return ResultJson(data=root_nodes)
