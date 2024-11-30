@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-@FileName  :error.py
-@Time      :2024/7/30 下午10:59
+@FileName  :errors.py
+@Time      :2024/11/29 14:18
 @Author    :XJC
 @Description:
 """
