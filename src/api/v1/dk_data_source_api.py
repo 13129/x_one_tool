@@ -25,15 +25,15 @@ class DkDnsRouter(VControllerBase):
     tags = ["数据源"]
     page = CustomPage
     response_schema = DkDataSourcesSchema
-    dns_service = Provide[DkDnsContainer.service]
+    dnsService = Provide[DkDnsContainer.service]
     logger = Provide[DkDnsContainer.logger]
 
     @RestGet(path='/getDataSources',
              summary='获取数据源',
-             dependencies=[Depends(pagination_ctx(page))],
+             dependencies=[Depends(dependency=pagination_ctx(page=page))],
              response_model=ResultJson[page[response_schema]])
     async def ov_get_all(self):
-        result = await self.dns_service.get_all()
+        result = await self.dnsService.get_all()
         return ResultJson(data=result)
 
     @RestGet(path='/getDataSourceInfo/{dns_id}',
@@ -41,7 +41,7 @@ class DkDnsRouter(VControllerBase):
              response_model=ResultJson[response_schema])
     async def ov_get_one(self, dns_id: str):
         try:
-            result = await self.dns_service.get_one(dns_id)
+            result = await self.dnsService.get_one(dns_id)
         except NotFoundError as e:
             return ResultJson(code=e.status_code, data=None, message=e.detail)
         else:

@@ -21,7 +21,7 @@ class DnsService:
         return await self._repository.get_all()
 
     async def get_one(self, _id: str) -> DkDataSourcesInfo:
-        return await self._repository.get_one(_id)
+        return await self._repository.get_one(_id=_id)
 
     async def delete_one(self, _id: str) -> Type[DkDataSourcesInfo]:
-        return await self._repository.delete_one(_id)
+        return await self._repository.delete_one(_id=_id)

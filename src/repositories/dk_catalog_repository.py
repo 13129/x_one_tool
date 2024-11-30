@@ -31,23 +31,23 @@ class DkCatalogRepository:
          async with self.session_factory() as session:
             query = select(DkCatalog).options(joinedload(DkCatalog.child_info, innerjoin=False)).filter(
                 DkCatalog.name_cn.like(f'%{name}%')).order_by(DkCatalog.order_no)
-            result = await paginate(session, query)
+            result = await paginate(conn=session, query=query)
             return result.model_dump()
 
     async def get_by_id(self, _id: str) -> DkCatalog:
         async with self.session_factory() as session:
             query = select(DkCatalog).where(DkCatalog.id == _id)
-            result = await session.execute(query)
+            result = await session.execute(statement=query)
             result = result.scalar()
             if not result:
-                raise DnsNotFoundError(status.HTTP_404_NOT_FOUND, None, None, _id)
+                raise DnsNotFoundError(status_code=status.HTTP_404_NOT_FOUND, detail=None, headers=None, entity_id=_id)
             return result
 
     async def delete_by_id(self, _id: str) -> Type[DkCatalog]:
         async with self.session_factory() as session:
-            result = await session.get(DkCatalog, _id)
+            result = await session.get(entity=DkCatalog, ident=_id)
             if not result:
                 raise DnsNotFoundError(status.HTTP_404_NOT_FOUND, None, None, _id)
-            await session.delete(result)
+            await session.delete(instance=result)
             await session.commit()
             return result

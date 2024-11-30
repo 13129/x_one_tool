@@ -22,15 +22,15 @@ class DkCatalogRouter(VControllerBase):
     tags = ["数据目录"]
 
     response_schema = DkCatalogRelSchemaDetail
-    catalog_service = Provide[DkCatalogContainer.service]
+    catalogService = Provide[DkCatalogContainer.service]
     page = CustomPage
     logger = Provide[DkCatalogContainer.logger]
 
     @RestGet(
         path='/getDkCatalogAll',
         summary='获取数据目录',
-        dependencies=[Depends(pagination_ctx(page))],
+        dependencies=[Depends(dependency=pagination_ctx(page=page))],
         response_model=ResultJson[page[response_schema]])
     async def ov_get_all(self, name: Optional[str] = '') -> ResultJson[Any]:
-        result = await self.catalog_service.get_all(name=name)
+        result = await self.catalogService.get_all(name=name)
         return ResultJson(data=result)
