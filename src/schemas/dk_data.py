@@ -160,6 +160,7 @@ class DkCatalogRelSchemaDetail(BaseModelSchema):
     name_cn: Optional[str]
     name_en: Optional[str]
     catalog_code: Optional[str]
+    parent_id:Optional[str]
     order_no: int
     is_show: bool
     creator: str
@@ -172,3 +173,4 @@ class DkCatalogRelSchemaDetail(BaseModelSchema):
         from_attributes = True
         alias_generator = to_camel
         populate_by_name = True
+

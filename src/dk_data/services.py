@@ -45,8 +45,8 @@ class DkCatalogService:
     def __init__(self, repository: DkCatalogRepository) -> None:
         self._repository: DkCatalogRepository = repository
 
-    async def get_all(self, name) -> list[DkCatalog]:
-        return await self._repository.get_all(name)
+    async def get_all(self) -> list[DkCatalog]:
+        return await self._repository.get_all()
 
     async def get_one(self, _id: str) -> DkCatalog:
         return await self._repository.get_one(_id)
