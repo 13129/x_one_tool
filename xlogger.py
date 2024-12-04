@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 from types import FrameType
-from typing import cast, List, Union, Any
+from typing import Any, List, Optional, cast
 
 from loguru import logger
 
@@ -10,9 +10,13 @@ from loguru import logger
 class Logger:
     """输出日志到文件和控制台"""
 
-    def __init__(self, module_name: str = None, cls_logger=logger, parent_dir: str = None,
-                 logs_dir: str = 'logs', level: int = 1):
-        parent_dir: str = parent_dir if parent_dir else os.getcwd()
+    def __init__(self,
+                 module_name: Optional[str] = None,
+                 cls_logger=logger,
+                 parent_dir: Optional[str] = None,
+                 logs_dir: str = 'logs',
+                 level: int = 1):
+        parent_dir = parent_dir if parent_dir else os.getcwd()
         self._LOGGING_DIR: str = os.path.join(parent_dir, logs_dir)
         if not os.path.isdir(self._LOGGING_DIR):
             os.makedirs(self._LOGGING_DIR)
@@ -50,10 +54,10 @@ class Logger:
         :param: More read loguru docs
         """
 
-        level: Union[int, str] = kwargs.get("level", self._LOGGING_LEVEL)
-        sink: Any = kwargs.get("sink")
+        level = kwargs.get("level", self._LOGGING_LEVEL)
+        sink = kwargs.get("sink")
         if not sink:
-            sink: str = tuple(
+            sink = tuple(
                 elem
                 for elem in self.levels
                 if elem["config"]["name"] == level
@@ -121,7 +125,10 @@ class Logger:
         return self._logger
 
     @classmethod
-    def get_logger(cls, obj: Any, module_name: str = 'default', level: int = 20, parent_dir: str = None,
+    def get_logger(cls, obj: Any,
+                   module_name: str = 'default',
+                   level: int = 20,
+                   parent_dir: Optional[str] = None,
                    logs_dir: str = 'logs'):
         obj._logger = cls(module_name=module_name, level=level, parent_dir=parent_dir,
                           logs_dir=logs_dir).get_default().get_new_logger()

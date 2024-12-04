@@ -6,14 +6,13 @@
 @Author    :XJC
 @Description:
 """
+from typing import Any, List, Type
 
-from typing import Any, List
-
-from dependency_injector.wiring import Provide, inject
+from dependency_injector.wiring import inject
 from fastapi import Depends
 from fastapi_pagination import pagination_ctx
 
-from src.common import RestGet, VControllerBase
+from src.common import RestGet, RestPost, VControllerBase
 from src.containers.dk_data import DkCatalogContainer, DkDnsContainer, DkTableContainer
 from src.core import ResultJson
 from src.core.dependency import CustomPage
@@ -27,27 +26,36 @@ class DkDnsRouter(VControllerBase):
     """
     prefix = "dataSourcesInfo"
     tags = ["数据源"]
-    page = CustomPage
-    response_schema = DkDataSourcesSchema
-    dnsService = Depends(Provide[DkDnsContainer.service])
-    logger = Provide[DkDnsContainer.logger]
+    dnsService = DkDnsContainer.service()
 
     @RestGet(path='/getDataSources',
              summary='获取数据源',
-             dependencies=[Depends(pagination_ctx(page))],
-             response_model=ResultJson[page[response_schema]])
+             dependencies=[Depends(pagination_ctx(CustomPage))],
+             response_model=ResultJson[CustomPage[DkDataSourcesSchema]])
     @inject
-    async def ov_get_all(self, dns_service = dnsService):
-        result = await dns_service.get_all()
+    async def ov_get_all(self):
+        result = await self.dnsService.get_all()
         return ResultJson(data=result)
 
     @RestGet(path='/getDataSourceInfo/{dns_id}',
              summary="数据源详情",
-             response_model=ResultJson[response_schema])
+             response_model=ResultJson[DkDataSourcesSchema])
     @inject
-    async def ov_get_one(self, dns_id: str, dns_service = dnsService):
+    async def ov_get_one(self, dns_id: str):
         try:
-            result = await dns_service.get_one(dns_id)
+            result = await self.dnsService.get_one(dns_id)
+        except NotFoundError as e:
+            return ResultJson(code=e.status_code, data=None, message=e.detail)
+        else:
+            return ResultJson(data=result)
+
+    @RestPost(path='/connectivityTest/?id={dns_id}',
+              summary="连通性测试",
+              response_model=ResultJson[DkDataSourcesSchema])
+    @inject
+    async def ov_connectivity_test(self, dns_id: str):
+        try:
+            result = await self.dnsService.get_one(dns_id)
         except NotFoundError as e:
             return ResultJson(code=e.status_code, data=None, message=e.detail)
         else:
@@ -57,39 +65,32 @@ class DkDnsRouter(VControllerBase):
 class DkTableRouter(VControllerBase):
     prefix = "dkTableInfo"
     tags = ["数据表"]
-    page = CustomPage
-    response_schema = DkTableSchema
-
-    tableService = Depends(Provide[DkTableContainer.service])
-    logger = Provide[DkTableContainer.logger]
+    tableService = DkTableContainer.service()
 
     @RestGet(
         path='/getTableList',
         summary='获取数据表',
-        dependencies=[Depends(pagination_ctx(page=page))],
-        response_model=ResultJson[page[response_schema]])
+        dependencies=[Depends(pagination_ctx(page=CustomPage))],
+        response_model=ResultJson[CustomPage[DkTableSchema]])
     @inject
-    async def ov_get_all(self, table_service = tableService) -> ResultJson[Any]:
-        result = await table_service.get_all()
+    async def ov_get_all(self) -> ResultJson[Any]:
+        result = await self.tableService.get_all()
         return ResultJson(data=result)
 
 
 class DkCatalogRouter(VControllerBase):
     prefix = "dkCatalog"
     tags = ["数据目录"]
-
-    response_schema = DkCatalogRelSchemaDetail
-    catalogService = Depends(Provide[DkCatalogContainer.service])
-    page = CustomPage
-    logger = Provide[DkCatalogContainer.logger]
+    catalogService = DkCatalogContainer.service()
 
     @RestGet(
         path='/getDkCatalogAll',
         summary='获取数据目录',
-        response_model=ResultJson[List[response_schema]])
+        response_model=ResultJson[List[DkCatalogRelSchemaDetail]])
     @inject
-    async def ov_get_all(self, catalog_service = catalogService) -> ResultJson[Any]:
-        result = await catalog_service.get_all()
+    async def ov_get_all(self) -> ResultJson[Any]:
+        result = await self.catalogService.get_all()
+        self.logger.info("测试")
 
         # 转换为 Pydantic 模型
         def build_tree(data, parent_id=''):

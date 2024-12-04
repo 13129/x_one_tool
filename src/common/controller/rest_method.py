@@ -1,14 +1,12 @@
 from enum import Enum
-from typing import Optional, List, Type, Any, Union, Sequence, Dict, Set, Callable
+from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Type, Union
 
 from fastapi import params
-from fastapi.datastructures import Default
-from fastapi.openapi.models import Response
-from fastapi.responses import JSONResponse
+from fastapi.datastructures import Default, DefaultPlaceholder
+from fastapi.responses import JSONResponse, Response
 from fastapi.routing import APIRoute
 
 from src.core.schema import RouteArgsBase
-from dependency_injector.wiring import inject
 
 
 def rest_route_decorator(methods_default: Optional[Union[Set[str], List[str]]]):
@@ -31,7 +29,7 @@ def rest_route_decorator(methods_default: Optional[Union[Set[str], List[str]]]):
                   response_model_exclude_defaults: bool = False,
                   response_model_exclude_none: bool = False,
                   include_in_schema: bool = True,
-                  response_class: Type[Response] = Default(JSONResponse),
+                  response_class: Union[Type[Response], DefaultPlaceholder] = Default(JSONResponse),
                   name: Optional[str] = None,
                   callbacks: Optional[List[APIRoute]] = None,
                   openapi_extra: Optional[Dict[str, Any]] = None,
