@@ -1,8 +1,10 @@
+import inspect
 import logging
 import os
 import sys
+from functools import wraps
 from types import FrameType
-from typing import cast, List, Union, Any
+from typing import cast, List, Union, Any, Optional
 
 from loguru import logger
 
@@ -10,10 +12,10 @@ from loguru import logger
 class Logger:
     """输出日志到文件和控制台"""
 
-    def __init__(self, module_name: str = None, cls_logger=logger, parent_dir: str = None,
+    def __init__(self, module_name: Optional[str] = None, parent_dir: Optional[str] = None, cls_logger=logger,
                  logs_dir: str = 'logs', level: int = 1):
-        parent_dir: str = parent_dir if parent_dir else os.getcwd()
-        self._LOGGING_DIR: str = os.path.join(parent_dir, logs_dir)
+        parent_dir = parent_dir if parent_dir else os.getcwd()
+        self._LOGGING_DIR: Optional[str] = os.path.join(parent_dir, logs_dir)
         if not os.path.isdir(self._LOGGING_DIR):
             os.makedirs(self._LOGGING_DIR)
         self._LOGGING_LEVEL: int = level
@@ -50,8 +52,8 @@ class Logger:
         :param: More read loguru docs
         """
 
-        level: Union[int, str] = kwargs.get("level", self._LOGGING_LEVEL)
-        sink: Any = kwargs.get("sink")
+        level = kwargs.get("level", self._LOGGING_LEVEL)
+        sink = kwargs.get("sink")
         if not sink:
             sink: str = tuple(
                 elem
