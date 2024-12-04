@@ -1,4 +1,5 @@
-from typing import Any, Callable, List, Type, Generator, Optional, Union
+from enum import Enum
+from typing import Any, Callable, List, Optional, Type, Union
 
 from src.core.crud_base import CRUDGenerator
 from src.core.type import PYDANTIC_SCHEMA as SCHEMA
@@ -10,26 +11,18 @@ try:
     from sqlalchemy.ext.declarative import DeclarativeMeta as Model, DeclarativeMeta
     from sqlalchemy.exc import IntegrityError
 except ImportError:
-    Model = None
-    Session = None
-    AsyncSession = None
-    IntegrityError = None
-    sqlalchemy_installed = False
-else:
-    sqlalchemy_installed = True
-    Session = Callable[..., Generator[Session, Any, None]]
-
-CALLABLE = Callable[..., Model]
-CALLABLE_LIST = Callable[..., List[Model]]
+    Session: Any  # no-redef
+    AsyncSession: Any  # no-redef
+    sqlalchemy_installed: Any
 
 
 class SQLAlchemyCRUDRouter(CRUDGenerator[SCHEMA]):
     def __init__(
             self,
             schema: Type[SCHEMA],
-            db: Callable[..., Union["Session", "AsyncSession"]],
+            db: Callable[..., Union[Session, AsyncSession]],
             prefix: Optional[str] = None,
-            tags: Optional[List[str]] = None,
+            tags: Optional[List[Union[str, Enum]]] = None,
             **kwargs: Any
     ) -> None:
         assert (
@@ -50,7 +43,7 @@ class VCRUDRouterBase(CRUDGenerator[SCHEMA]):
     def __init__(
             self,
             prefix: Optional[str] = None,
-            tags: Optional[List[str]] = None,
+            tags: Optional[List[Union[str, Enum]]] = None,
             **kwargs: Any
     ) -> None:
         super().__init__(

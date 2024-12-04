@@ -5,6 +5,7 @@ coding:utf-8
 @Description:
 """
 from abc import ABC
+from enum import Enum
 from typing import Any, Callable, Generic, List, Optional, Type, Union
 
 from fastapi import APIRouter, HTTPException
@@ -22,7 +23,7 @@ class CRUDGenerator(Generic[T], APIRouter, ABC):
     def __init__(
             self,
             prefix: Optional[str] = None,
-            tags: Optional[List[str]] = None,
+            tags: Optional[List[Union[str, Enum]]] = None,
             **kwargs: Any,
     ) -> None:
 

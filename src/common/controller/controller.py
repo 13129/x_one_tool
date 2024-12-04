@@ -3,7 +3,6 @@ import functools
 import inspect
 from typing import Any, List, Optional
 
-from dependency_injector.wiring import inject
 from fastapi.datastructures import Default
 from fastapi.responses import JSONResponse
 from fastapi.utils import generate_unique_id
@@ -17,7 +16,7 @@ from .crud import VCRUDRouterBase
 class VControllerBase(metaclass=abc.ABCMeta):
     __slots__ = ["api_router", "tags", "prefix", "session", "schema"]
     prefix: Optional[str]
-    tags: Optional[List[str]]
+    tags: Optional[List[Union[str, Enum]]]
     session: Optional[Session]
     # response_schema: Optional[Any]
     schema: Optional[Any]
@@ -46,7 +45,7 @@ class VControllerBase(metaclass=abc.ABCMeta):
                 redirect_slashes=getattr(self.cls, 'redirect_slashes', True),
                 default=getattr(self.cls, 'default', None),
                 dependency_overrides_provider=getattr(self.cls, 'dependency_overrides_provider', None),
-                route_class=getattr(self.cls, 'route_class',ContextIncludedRoute),
+                route_class=getattr(self.cls, 'route_class', ContextIncludedRoute),
                 on_startup=getattr(self.cls, 'on_startup', None),
                 on_shutdown=getattr(self.cls, 'on_shutdown', None),
                 deprecated=getattr(self.cls, 'deprecated', None),

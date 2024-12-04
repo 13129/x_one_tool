@@ -9,7 +9,7 @@
 import asyncio
 import logging
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
-from typing import Callable,AsyncIterator
+from typing import Callable,AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session, async_sessionmaker, create_async_engine
 
@@ -31,7 +31,7 @@ class Database:
         )
 
     @asynccontextmanager
-    async def dk_async_session(self) -> AsyncIterator[AsyncSession]:
+    async def dk_async_session(self) -> AsyncGenerator:
         session: AsyncSession = self._session_factory()
         try:
             yield session

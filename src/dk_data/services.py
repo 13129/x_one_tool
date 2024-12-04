@@ -7,7 +7,7 @@
 @Description:
 """
 
-from typing import Type
+from typing import Sequence, Type
 
 from .models import DkCatalog,DkDataSourcesInfo,DkTableInfo
 from .repositories import DkCatalogRepository,DkTableInfoRepository,DnsRepository
@@ -24,7 +24,7 @@ class DnsService:
     async def get_one(self, _id: str) -> DkDataSourcesInfo:
         return await self._repository.get_one(_id)
 
-    async def delete_one(self, _id: str) -> Type[DkDataSourcesInfo]:
+    async def delete_one(self, _id: str) -> DkDataSourcesInfo:
         return await self._repository.delete_one(_id)
 
 
@@ -45,7 +45,7 @@ class DkCatalogService:
     def __init__(self, repository: DkCatalogRepository) -> None:
         self._repository: DkCatalogRepository = repository
 
-    async def get_all(self) -> list[DkCatalog]:
+    async def get_all(self) -> Sequence[DkCatalog]:
         return await self._repository.get_all()
 
     async def get_one(self, _id: str) -> DkCatalog:
