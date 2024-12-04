@@ -11,8 +11,6 @@ from sqlalchemy.orm import Session
 
 from src.common.middleware.router_class import ContextIncludedRoute
 from src.core import RouteArgsBase
-from src.core.container import BaseContainer
-from xlogger import Logger
 from .crud import VCRUDRouterBase
 
 
@@ -21,7 +19,6 @@ class VControllerBase(metaclass=abc.ABCMeta):
     prefix: Optional[str]
     tags: Optional[List[Union[str, Enum]]]
     session: Optional[Session]
-    logger: Logger = BaseContainer.logger().xlog
 
     def __init__(self):
         self.api_router = None

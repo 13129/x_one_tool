@@ -1,5 +1,6 @@
 from src.common.controller.controller import VControllerBase
 from src.common.controller.rest_method import rest_route_decorator
+from src.common.utils.xlog import XLogMixin
 
 RestGet = rest_route_decorator(methods_default=['GET'])
 RestPost = rest_route_decorator(methods_default=['POST'])
