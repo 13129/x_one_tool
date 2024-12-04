@@ -9,51 +9,17 @@
 import uuid
 from json import JSONDecodeError
 from time import perf_counter
-from typing import Callable, Optional
+from typing import Callable
 
 from fastapi import Request
 from fastapi.responses import Response
 from fastapi.routing import APIRoute
 
-from xlogger import log as loggers
-from .json_dp import dict_to_json_ensure_ascii, json_to_dict
+from src.common.utils.xlog import XLogMixin
+from src.common.utils.json_dp import json_to_dict
 
 
-class ContextIncludedRoute(APIRoute):
-
-    @staticmethod
-    async def async_trace_add_log_record(request: Request,
-                                         event_des: Optional[str] = None,
-                                         msg_dict: Optional[dict] = None,
-                                         remarks: Optional[str] = None):
-        """
-        :param request:
-        :param event_des: 日志记录事件描述
-        :param msg_dict: 日志记录信息字典
-        :param remarks: 日志备注信息
-        :return:
-        """
-
-        if hasattr(request, 'traceid'):
-            _log = {
-                'traceid': getattr(request, 'traceid'),
-                'trace_index': getattr(request, 'trace_links_index'),
-                'event_des': event_des,
-                'msg_dict': msg_dict,
-                'remarks': remarks
-            }
-            if not remarks:
-                _log.pop('remarks')
-            if not msg_dict:
-                _log.pop('msg_dict')
-            try:
-                _msg = dict_to_json_ensure_ascii(_log)
-                loggers.info(_msg)
-            except:
-                loggers.info(
-                    getattr(request, 'traceid') + ':index:' + str(
-                        getattr(request, 'trace_links_index')) + ':log info write error!!!')
-
+class ContextIncludedRoute(APIRoute, XLogMixin):
     async def _init_trace_start_log_record(self, request: Request):
         """
         请求记录初始化
@@ -63,66 +29,62 @@ class ContextIncludedRoute(APIRoute):
         path_info = request.url.path
         if path_info not in ['/favicon.ico'] and 'websocket' not in path_info:
             if request.method != 'OPTIONS':
-                request.state.trace_links_index = 0
-                request.state.traceid = str(uuid.uuid4()).replace('-', '')
-                request.state.start_time = perf_counter()
-                ip = None
-                method = None
-                url = None
-                if request.client is not None:
-                    ip, method, url = request.client.host, request.method, request.url.path
+                request.trace_links_index = 0
+                request.traceid = str(uuid.uuid4()).replace('-', '')
+                request.start_time = perf_counter()
+                ip, method, url = request.client.host, request.method, request.url.path
                 try:
-                    _form = await request.form()
+                    body_form = await request.form()
                 except:
-                    _form = None
+                    body_form = None
 
-                _body = None
+                body = None
                 try:
-                    _bytes = await request.body()
-                    if _bytes:
+                    body_bytes = await request.body()
+                    if body_bytes:
                         try:
-                            _body = await request.json()
+                            body = await request.json()
                         except (TypeError, ValueError):
                             pass
-                            if _bytes:
+                            if body_bytes:
                                 try:
-                                    _body = _bytes.decode('utf-8')
+                                    body = body_bytes.decode('utf-8')
                                 except JSONDecodeError:
-                                    _body = _bytes.decode('gb2312')
+                                    body = body_bytes.decode('gb2312')
                 except Exception:
-                    _body = None
-                finally:
-                    _msg = {
-                        'headers': request.headers if str(request.headers) else '',
-                        'url': url,
-                        'method': method,
-                        'ip': ip,
-                        'params': {
-                            'query_params': '' if not request.query_params else request.query_params,
-                            'from': str(_form),
-                            'body': _body
-                        },
-                    }
-                    await self.async_trace_add_log_record(request, event_des='request_start', msg_dict=_msg)
+                    body = None
+                    pass
+                log_msg = {
+                    'headers': request.headers if str(request.headers) else '',
+                    'url': url,
+                    'method': method,
+                    'ip': ip,
+                    'params': {
+                        'query_params': '' if not request.query_params else request.query_params,
+                        'from': str(body_form),
+                        'body': body
+                    },
+                }
+                await self.async_trace_add_log_record(request, event_des='request_start', msg_dict=log_msg)
 
     async def _init_trace_end_log_record(self, request: Request, response: Response):
         if hasattr(request, 'traceid'):
             start_time = getattr(request, 'start_time')
             end_time = f'{(perf_counter() - start_time):.2f}'
-            _body = None
+            resp_body = None
             if isinstance(response, Response):
                 if response.headers.get('content-type') == 'application/json':
-                    _body = json_to_dict(response.body)
+                    resp_body = json_to_dict(response.body)
                 else:
                     try:
-                        _body = str(response.body)
+                        resp_body = str(response.body)
                     except AttributeError:
-                        _body = ''
-            _msg = {
+                        resp_body = ''
+            log_msg = {
                 'cost_time': end_time,
-                'resp_body': _body
+                'resp_body': resp_body
             }
-            await self.async_trace_add_log_record(request, event_des='request_end', msg_dict=_msg)
+            await self.async_trace_add_log_record(request, event_des='request_end', msg_dict=log_msg)
 
     def get_route_handler(self) -> Callable:
         original_route_handler = super().get_route_handler()
