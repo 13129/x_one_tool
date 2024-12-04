@@ -1,7 +1,8 @@
 import abc
 import functools
 import inspect
-from typing import Any, List, Optional
+from enum import Enum
+from typing import List, Optional, Union
 
 from fastapi.datastructures import Default
 from fastapi.responses import JSONResponse
@@ -14,12 +15,10 @@ from .crud import VCRUDRouterBase
 
 
 class VControllerBase(metaclass=abc.ABCMeta):
-    __slots__ = ["api_router", "tags", "prefix", "session", "schema"]
+    __slots__ = ["api_router", "tags", "prefix", "session"]
     prefix: Optional[str]
     tags: Optional[List[Union[str, Enum]]]
     session: Optional[Session]
-    # response_schema: Optional[Any]
-    schema: Optional[Any]
 
     def __init__(self):
         self.api_router = None

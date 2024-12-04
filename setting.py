@@ -22,7 +22,7 @@ class GlobalSetting(BaseSettings):
     DESCRIPTION: str = Field(default='x_one_tool')
     DEBUG: bool = Field(default=False)
     RELOAD: bool = Field(default=False)
-    TIMEZONE: str = Field(default='UTC')
+    TIMEZONE: str = Field(default='UTC+8')
     PORT: int = Field(default=8000)
     HOST: str = Field(default='127.0.0.1')
     LOG_LEVEL: int = Field(default=1)

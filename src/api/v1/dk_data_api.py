@@ -6,20 +6,21 @@
 @Author    :XJC
 @Description:
 """
-from typing import Any, List, Type
+from typing import Any, List
 
 from dependency_injector.wiring import inject
 from fastapi import Depends
 from fastapi_pagination import pagination_ctx
 
-from src.common import RestGet, RestPost, VControllerBase
+from src.common import RestGet, RestPost, VControllerBase, XLogMixin
 from src.containers.dk_data import DkCatalogContainer, DkDnsContainer, DkTableContainer
 from src.core import ResultJson
 from src.core.dependency import CustomPage
 from src.core.error import NotFoundError
 from src.schemas import DkCatalogRelSchemaDetail, DkDataSourcesSchema, DkTableSchema
 
-class DkDnsRouter(VControllerBase):
+
+class DkDnsRouter(VControllerBase, XLogMixin):
     """
     管理数据源
     """
@@ -34,6 +35,7 @@ class DkDnsRouter(VControllerBase):
     @inject
     async def ov_get_all(self):
         result = await self.dnsService.get_all()
+        self.log.info("测试-------------")
         return ResultJson(data=result)
 
     @RestGet(path='/getDataSourceInfo/{dns_id}',
@@ -61,7 +63,7 @@ class DkDnsRouter(VControllerBase):
             return ResultJson(data=result)
 
 
-class DkTableRouter(VControllerBase):
+class DkTableRouter(VControllerBase, XLogMixin):
     prefix = "dkTableInfo"
     tags = ["数据表"]
     tableService = DkTableContainer.service()
@@ -77,7 +79,7 @@ class DkTableRouter(VControllerBase):
         return ResultJson(data=result)
 
 
-class DkCatalogRouter(VControllerBase):
+class DkCatalogRouter(VControllerBase, XLogMixin):
     prefix = "dkCatalog"
     tags = ["数据目录"]
     catalogService = DkCatalogContainer.service()
@@ -89,7 +91,7 @@ class DkCatalogRouter(VControllerBase):
     @inject
     async def ov_get_all(self) -> ResultJson[Any]:
         result = await self.catalogService.get_all()
-        self.logger.info("测试")
+        self.log.info("测试")
 
         # 转换为 Pydantic 模型
         def build_tree(data, parent_id=''):

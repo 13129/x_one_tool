@@ -14,6 +14,7 @@ app = FastAPI(
     title=settings.TITLE,
     description=settings.DESCRIPTION,
     debug=settings.DEBUG,
+    timezone=settings.TIMEZONE,
     log_level="info",
     docs_url=None,
     redoc_url=None,
