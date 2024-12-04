@@ -32,6 +32,7 @@ app.mount('/static', StaticFiles(directory='static'), name='static')
 app.router.route_class = ContextIncludedRoute
 app.openapi = custom_static_openapi(app)
 
+
 @app.get('/')
 def root():
     return {"status": "ok"}

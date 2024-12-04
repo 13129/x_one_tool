@@ -1,12 +1,12 @@
+from enum import Enum
+from typing import Any, Dict, List, Sequence, Set, Type, Union
 from typing import Generic, Optional, TypeVar
-from typing import Type, Any, List, Sequence, Dict, Union, Set
 
 from fastapi import params
-from fastapi.datastructures import DefaultPlaceholder, Default
-from fastapi.openapi.models import Response
-from fastapi.responses import JSONResponse
+from fastapi.datastructures import Default, DefaultPlaceholder
+from fastapi.responses import JSONResponse,Response
 from fastapi.routing import APIRoute
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel
 
 T = TypeVar('T')  # 泛型类型 T
 
@@ -28,7 +28,7 @@ class RouteArgsBase(BaseModel):
     path: str
     response_model: Optional[Type[Any]] = None
     status_code: Optional[int] = None
-    tags: Optional[List[str]] = None
+    tags: Optional[List[Union[str, Enum]]] = None
     dependencies: Optional[Sequence[params.Depends]] = None
     summary: Optional[str] = None
     description: Optional[str] = None
@@ -54,5 +54,3 @@ class RouteArgsBase(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-
-

@@ -35,7 +35,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-def custom_static_openapi(app: FastAPI):
+def custom_static_openapi(app):
     @app.get("/docs", include_in_schema=False)
     async def custom_swagger_ui_html() -> HTMLResponse:
         return get_swagger_ui_html(
@@ -47,7 +47,7 @@ def custom_static_openapi(app: FastAPI):
         )
 
     @app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)
-    async def swagger_ui_redirect() -> HTMLResponse:
+    async def swagger_ui_redirect():
         return get_swagger_ui_oauth2_redirect_html()
 
     @app.get("/redoc", include_in_schema=False)

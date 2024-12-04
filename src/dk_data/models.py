@@ -73,7 +73,7 @@ class DkTableInfo(DBBaseModel):
 
 class DkTableFieldInfo(DBBaseModel):
     __tablename__ = 'dk_catalog_field'
-    table_code: Mapped[str] = Column(Integer, comment="表编码")
+    table_code: Mapped[int] = Column(Integer, comment="表编码")
     physical_table_name: Mapped[str] = Column(String(128), comment="物理表名")
     name_en: Mapped[str] = Column(String(128), comment="字段英文名")
     name_cn: Mapped[Optional[str]] = Column(String(512), comment="字段中文名")

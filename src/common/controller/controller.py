@@ -1,9 +1,9 @@
 import abc
 import functools
 import inspect
-from typing import Any, List, Optional
+from enum import Enum
+from typing import Any, List, Optional, Union
 
-from dependency_injector.wiring import inject
 from fastapi.datastructures import Default
 from fastapi.responses import JSONResponse
 from fastapi.utils import generate_unique_id
@@ -11,17 +11,17 @@ from sqlalchemy.orm import Session
 
 from src.common.middleware.router_class import ContextIncludedRoute
 from src.core import RouteArgsBase
+from src.core.container import BaseContainer
+from xlogger import Logger
 from .crud import VCRUDRouterBase
 
 
 class VControllerBase(metaclass=abc.ABCMeta):
-    __slots__ = ["api_router", "tags", "prefix", "session", "page", "response_schema", "schema"]
+    __slots__ = ["api_router", "tags", "prefix", "session"]
     prefix: Optional[str]
-    tags: Optional[List[str]]
+    tags: Optional[List[Union[str, Enum]]]
     session: Optional[Session]
-    page: Optional[Any]
-    response_schema: Optional[Any]
-    schema: Optional[Any]
+    logger: Logger = BaseContainer.logger().xlog
 
     def __init__(self):
         self.api_router = None
@@ -47,7 +47,7 @@ class VControllerBase(metaclass=abc.ABCMeta):
                 redirect_slashes=getattr(self.cls, 'redirect_slashes', True),
                 default=getattr(self.cls, 'default', None),
                 dependency_overrides_provider=getattr(self.cls, 'dependency_overrides_provider', None),
-                route_class=getattr(self.cls, 'route_class',ContextIncludedRoute),
+                route_class=getattr(self.cls, 'route_class', ContextIncludedRoute),
                 on_startup=getattr(self.cls, 'on_startup', None),
                 on_shutdown=getattr(self.cls, 'on_shutdown', None),
                 deprecated=getattr(self.cls, 'deprecated', None),
