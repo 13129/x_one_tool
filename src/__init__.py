@@ -17,12 +17,12 @@ from fastapi.responses import HTMLResponse
 from setting import settings
 from src.api import dk_api
 from xlogger import Loggers
-from .module import Application
+from src.module import Application
 
 
 def init_di(app):
     container = Application()
-    container.wire(modules=[__name__])
+    container.wire(modules=["src.api.v1.dk_data_api"])
     app.container = container
     app.include_router(dk_api, prefix=settings.API_V1_STR)
 

@@ -13,7 +13,9 @@ try:
 except ImportError:
     Session: Any  # no-redef
     AsyncSession: Any  # no-redef
-    sqlalchemy_installed: Any
+    sqlalchemy_installed = False
+else:
+    sqlalchemy_installed = True
 
 
 class SQLAlchemyCRUDRouter(CRUDGenerator[SCHEMA]):

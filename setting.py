@@ -34,6 +34,7 @@ class GlobalSetting(BaseSettings):
     DB_ECHO_LOG: bool = Field(default=False)
     DB_LOGGING_NAME: str = Field(default='x_one_tool')
     LogPath: str = Field(default='logs')
+    LogConfigPath: str = Field(default='conf.json')
     model_config = SettingsConfigDict(env_file=(".env", ".env.prod"),
                                       env_file_encoding="utf-8")
 

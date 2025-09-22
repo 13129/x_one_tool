@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-@FileName  :dk_data.py
+@FileName  :dk_container
 @Time      :2024/11/29 14:24
 @Author    :XJC
 @Description:
@@ -10,13 +10,12 @@
 from dependency_injector import containers, providers
 
 from src.core.container import BaseContainer
-from src.dk_data.repositories import DkCatalogRepository
-from src.dk_data.repositories import DkTableInfoRepository
-from src.dk_data.repositories import DnsRepository
-from src.dk_data.services import DkCatalogService
-from src.dk_data.services import DkTableInfoService
-from src.dk_data.services import DnsService
-
+from src.dk_data.repositories.dns_repository import DkCatalogRepository
+from src.dk_data.repositories.dns_repository import DkTableInfoRepository
+from src.dk_data.repositories.dns_repository import DnsRepository
+from src.dk_data.services.dns_service import DkCatalogService
+from src.dk_data.services.dns_service import DkTableInfoService
+from src.dk_data.services.dns_service import DnsService
 
 
 class DkDnsContainer(BaseContainer):
@@ -31,7 +30,6 @@ class DkDnsContainer(BaseContainer):
     )
 
 
-
 class DkTableContainer(BaseContainer):
     wiring_config = containers.WiringConfiguration(modules=["src.api.v1"])
 
@@ -43,7 +41,6 @@ class DkTableContainer(BaseContainer):
         DkTableInfoService,
         repository=repository,
     )
-
 
 
 class DkCatalogContainer(BaseContainer):

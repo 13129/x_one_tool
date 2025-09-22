@@ -57,7 +57,8 @@ class VControllerBase(metaclass=abc.ABCMeta):
 
     def _register_endpoint(self) -> VCRUDRouterBase:
         # 获取当前注入的APIRouter对象
-        assert hasattr(self, 'api_router'), '需要实例化APIRouter对象'
+        if self.api_router is None:
+            assert hasattr(self, 'api_router'), '需要实例化APIRouter对象'
         # 获取当前注入的APIRouter对象
         self._creat_api_router()
         # 当前类下下定义对应的特定特点包含有被标记了_endpoint属性的路由函数
@@ -76,13 +77,15 @@ class VControllerBase(metaclass=abc.ABCMeta):
                 curr_route_endpoint = functools.partial(route_endpoint, self)
                 # 注意事项---处理经过functools.partial后丢失__name__的问题
                 route_args.name = route_args.name or route_endpoint.__name__
+                doc = inspect.getdoc(route_endpoint)  # 更安全地获取文档
+                route_args.description = route_args.description or (doc and inspect.cleandoc(doc)) or ""
 
-                def cleandoc():
-                    curr_route_endpoint.__doc__ = ''
-
-                # 函数注释说明信息。文档显示描述问题处理
-                route_args.description = route_args.description or inspect.cleandoc(
-                    route_endpoint.__doc__ or '') or cleandoc()
+                # def cleandoc():
+                #     curr_route_endpoint.__doc__ = ''
+                #
+                # # 函数注释说明信息。文档显示描述问题处理
+                # route_args.description = route_args.description or inspect.cleandoc(
+                #     route_endpoint.__doc__ or '') or cleandoc()
                 # 开始添加当前被被RestRout给注册的端点函数
                 self.api_router.add_api_route(**route_args.model_dump(), endpoint=curr_route_endpoint)
         return self.api_router
@@ -92,6 +95,7 @@ class VControllerBase(metaclass=abc.ABCMeta):
         return self._register_endpoint()
 
     @classmethod
+    @functools.lru_cache(maxsize=128)
     def instance(cls) -> VCRUDRouterBase:
         """实例化"""
         return cls().build()

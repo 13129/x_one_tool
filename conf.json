@@ -1,0 +1,18 @@
+{
+  DEBUG: sink
+  :
+  "sys.stdout"
+  format: "{time:YYYY-MM-DD HH:mm:ss}| {process.name} | {thread.name} | [{level}] | <cyan>{module}</cyan>.<cyan>{function}</cyan>:<cyan>{line}</cyan> | <level>{level}</level>: <level>{message}</level> "
+  level: "DEBUG"
+
+  INFO: sink
+  :
+  "logs/"
+  format: "{time:YYYY-MM-DD HH:mm:ss}| {process.name} | {thread.name} | [{level}] | <cyan>{module}</cyan>.<cyan>{function}</cyan>:<cyan>{line}</cyan> | <level>{level}</level>: <level>{message}</level> "
+  level: "INFO"
+  rotation: "100 MB"
+  retention: "10 days"
+  compression: "zip"
+  enqueue: True
+  backtrace: True
+}

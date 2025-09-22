@@ -59,7 +59,7 @@ class CRUDGenerator(Generic[T], APIRouter, ABC):
         return super().api_route(path, *args, **kwargs)
 
     def get(self, path: str, *args: Any, **kwargs: Any) -> Callable[[DecoratedCallable], DecoratedCallable]:
-        self.remove_api_route(path, ["Get"])
+        self.remove_api_route(path, ["GET"])
         return super().get(path, *args, **kwargs)
 
     def post(self, path: str, *args: Any, **kwargs: Any) -> Callable[[DecoratedCallable], DecoratedCallable]:

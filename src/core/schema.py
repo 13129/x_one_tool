@@ -1,10 +1,10 @@
 from enum import Enum
 from typing import Any, Dict, List, Sequence, Set, Type, Union
-from typing import Generic, Optional, TypeVar
+from typing import Generic, Optional, TypeVar, Callable
 
 from fastapi import params
 from fastapi.datastructures import Default, DefaultPlaceholder
-from fastapi.responses import JSONResponse,Response
+from fastapi.responses import JSONResponse, Response
 from fastapi.routing import APIRoute
 from pydantic import BaseModel
 
@@ -12,8 +12,8 @@ T = TypeVar('T')  # 泛型类型 T
 
 
 class ResultJson(BaseModel, Generic[T]):
-    code: int = 200
-    message: str = 'Success'
+    code: Optional[int] = 200
+    message: Optional[str] = 'Success'
     data: Optional[T] = None
 
 
@@ -52,5 +52,21 @@ class RouteArgsBase(BaseModel):
     callbacks: Optional[List[APIRoute]] = None
     openapi_extra: Optional[Dict[str, Any]] = None
 
+    # 权限控制扩展字段（自定义）
+    # permissions: Optional[List[str]] = None  # 如 ["user:read", "admin"]
+    # roles: Optional[List[str]] = None  # 如 ["admin", "editor"]
+    # scopes: Optional[List[str]] = None  # OAuth2 scopes
+    #
+    # # 日志标记
+    # enable_logging: bool = True
+    # log_request: bool = True
+    # log_response: bool = True
+    #
+    # # 自定义中间件钩子
+    # pre_handler: Optional[Callable] = None  # 执行前
+    # post_handler: Optional[Callable] = None  # 成功后
+    # on_error: Optional[Callable] = None  # 出错时
+
     class Config:
         arbitrary_types_allowed = True
+        # extra = "allow"  # 允许额外字段（兼容未来 FastAPI 更新）

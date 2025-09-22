@@ -34,8 +34,7 @@ def rest_route_decorator(methods_default: Optional[Union[Set[str], List[str]]]):
                   callbacks: Optional[List[APIRoute]] = None,
                   openapi_extra: Optional[Dict[str, Any]] = None,
                   **kwargs: Any):
-        if methods is None:
-            methods = methods_default
+        methods = methods or methods_default
 
         def call_func(fun: Callable) -> Callable[[Callable], Callable]:
             route_args = RouteArgsBase(path=path,

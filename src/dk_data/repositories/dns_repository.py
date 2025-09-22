@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-@FileName  :repositories.py
+@FileName  :dns_repository.py
 @Time      :2024/11/29 14:12
 @Author    :XJC
 @Description:
 """
 
 from contextlib import AbstractAsyncContextManager
-from typing import Callable, Optional, Sequence, Type
+from typing import Callable, Optional, Sequence
 
 from fastapi import status
 from fastapi_pagination.ext.sqlalchemy import paginate
@@ -16,8 +16,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from .errors import DnsNotFoundError
-from .models import DkCatalog, DkDataSourcesInfo, DkTableInfo
+from src.dk_data.errors import DnsNotFoundError
+from src.dk_data.db_model.dns_model import DkCatalog, DkDataSourcesInfo, DkTableInfo
 
 
 class DnsTypeRepository:
